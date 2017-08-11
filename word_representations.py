@@ -29,7 +29,8 @@ NB_SAMPLES = 1000000
 # random_bitvector - каждому слову приписывается случайный бинарный вектор фиксированной длины с заданной пропорцией 0/1
 # bc - в качестве репрезентаций используются векторы, созданные в результате работы brown clustering
 # chars - каждое слово кодируется как цепочка из 1-hot репрезентаций символов
-REPRESENTATIONS = 'random_bitvector' # 'w2v' | 'random_bitvector' | 'bc' | 'chars' ...
+# hashing_trick - используется hashing trick для кодирования слов ограниченным числом битов индекса
+REPRESENTATIONS = 'hashing_trick' # 'w2v' | 'random_bitvector' | 'bc' | 'chars' | 'hashing_trick' ...
 
 
 # -------------------------------------------------------------------
@@ -345,6 +346,44 @@ class Chars_Vectorizer(BaseVectorizer):
 
 # -------------------------------------------------------------------
 
+class HashingTrick_Vectorizer(BaseVectorizer):
+    """
+    Использование Hashing Trick (https://en.wikipedia.org/wiki/Feature_hashing)
+    """
+    def __init__(self):
+        super(HashingTrick_Vectorizer,self).__init__()
+
+    @classmethod
+    def get_name(self):
+        return 'hashing_trick'
+
+    def vectorize_dataset(self):
+
+        (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words=None)
+
+        NB_SLOTS = 32000 # столько элементов будет в хэш-таблице, так что
+                         # некоторое количество слов будут давать коллизии
+        hash_dict = gensim.corpora.hashdictionary.HashDictionary( id_range=NB_SLOTS, debug=True)
+
+        nb_words = len(all_words)
+
+        # -------------------------------------------------------------------
+
+        y_data = np.zeros((NB_SAMPLES), dtype='bool')
+        y_data[:] = dataset_y[:]
+
+        input_size = NB_SLOTS * NGRAM_ORDER
+        X_data = lil_matrix( (NB_SAMPLES, input_size), dtype='bool')
+
+        for idata, ngram in enumerate(dataset_x):
+            tokens = hash_dict.doc2bow( ngram, allow_update=True )
+            for iword,(token_id,token_count) in enumerate(tokens):
+                X_data[idata, iword*NB_SLOTS + token_id] = True
+
+        return (X_data, y_data)
+
+# -------------------------------------------------------------------
+
 def get_dataset_generator(representation_name):
     """
     Фабрика для генераторов датасетов.
@@ -359,6 +398,8 @@ def get_dataset_generator(representation_name):
         return BrownClusters_Vectorizer()
     elif representation_name == Chars_Vectorizer.get_name():
         return Chars_Vectorizer()
+    elif representation_name == HashingTrick_Vectorizer.get_name():
+        return HashingTrick_Vectorizer()
     else:
         raise NotImplemented()
 
