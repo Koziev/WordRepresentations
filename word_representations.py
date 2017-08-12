@@ -17,6 +17,9 @@ import random
 from scipy.sparse import lil_matrix
 import xgboost
 import sklearn.model_selection
+from itertools import chain
+import sys
+
 
 # арность N-грамм
 NGRAM_ORDER = 3
@@ -384,24 +387,35 @@ class HashingTrick_Vectorizer(BaseVectorizer):
 
 # -------------------------------------------------------------------
 
+def subclasses(cls):
+    """
+    Вспомогательная функция для получения всех подклассов для заданного класса,
+    включая второй и последующий уровни иерархии, если вдруг понадобиться отнаследоваться
+    от Chars_Vectorizer, например.
+    :param cls: базовый класс
+    :return: список классов-наследников
+    """
+    return list(
+        chain.from_iterable(
+            [list(chain.from_iterable([[x], subclasses(x)])) for x in cls.__subclasses__()]
+        )
+    )
+
 def get_dataset_generator(representation_name):
     """
-    Фабрика для генераторов датасетов.
+    Фабрика для генераторов датасетов. Класс, который будет выполнять векторизацию, ищется
+    по заданной условной строковой метке. Эту же метку возвращает метод get_name() в классах.
+
     :param representation_name: наименование способа представления слов
     :return: объект класса, производного от BaseVectorizer, который будет выполнять генерацию матриц датасета.
     """
-    if representation_name == W2V_Vectorizer.get_name():
-        return W2V_Vectorizer()
-    elif representation_name == BinaryWord_Vectorizer.get_name():
-        return BinaryWord_Vectorizer()
-    elif representation_name == BrownClusters_Vectorizer.get_name():
-        return BrownClusters_Vectorizer()
-    elif representation_name == Chars_Vectorizer.get_name():
-        return Chars_Vectorizer()
-    elif representation_name == HashingTrick_Vectorizer.get_name():
-        return HashingTrick_Vectorizer()
-    else:
-        raise NotImplemented()
+
+    for vectorizer_class in subclasses(BaseVectorizer):
+        label = getattr( vectorizer_class, 'get_name' )()
+        if label == representation_name:
+            return vectorizer_class()
+
+    raise NotImplemented()
 
 # -------------------------------------------------------------------
 
