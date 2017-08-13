@@ -1,0 +1,1 @@
+E:\polygon\WordRepresentations\CSharpModels\With_CNTK\bin\Release\With_CNTK.exe.config

@@ -3,7 +3,9 @@
 ## Решаемая задача
 
 Этот экспериментальный бенчмарк сравнивает разные способы представления слов
-в следующей задаче. Есть N-грамма заранее выбранной длины (см. константу NGRAM_ORDER 
+в упрощенной задаче построения так называемой language model (https://en.wikipedia.org/wiki/Language_model).
+
+Есть N-грамма заранее выбранной длины (см. константу NGRAM_ORDER 
 в модуле DatasetVectorizers). Если она получена из текстового корпуса (путь к utf-8 файлу
 прошит в методе _get_corpus_path класса BaseVectorizer), то считаем, что
 это валидное сочетание слов и целевое значение y=1. Если же N-грамма получена случайной
@@ -26,31 +28,74 @@
 
 * **random_bitvector** - каждому слову приписывается случайный бинарный вектор фиксированной длины с заданной пропорцией 0/1  
 
-* **bc** - в качестве репрезентаций используются векторы, созданные в результате работы brown clustering (см. [https://en.wikipedia.org/wiki/Brown_clustering])
+* **bc** - в качестве репрезентаций используются векторы, созданные в результате работы brown clustering (см. описание https://en.wikipedia.org/wiki/Brown_clustering и реализацию https://github.com/percyliang/brown-cluster)  
 
 * **chars** - каждое слово кодируется как цепочка из 1-hot репрезентаций символов  
 
-* **hashing_trick** - используется hashing trick для кодирования слов ограниченным числом битов индекса   (см. [https://en.wikipedia.org/wiki/Feature_hashing])
-
+* **hashing_trick** - используется hashing trick для кодирования слов ограниченным числом битов индекса   (см. описание https://en.wikipedia.org/wiki/Feature_hashing и реализацию https://radimrehurek.com/gensim/corpora/hashdictionary.html)  
 
 Для нейросетки используется слой Embedding, поэтому внешнее представление слов - целочисленные
 индексы, а фактическое внутреннее - векторы встраивания, настраиваемые в ходе оптимизации
 нейросети.
 
-## Модули
+## Модули и решатели
 
-`DatasetVectorizers.py` - векторизаторы датасета и фабрика для удобного выбора
-`word_representations.py` - решатель на базе XGBoost
-`wr_keras.py` - решатель на базе feed forward нейросетки в Keras
+Запускаемые программы:  
+PyModels/wr_xgboost.py - решатель на базе XGBoost (Python)
+PyModels/wr_catboost.py - решатель на базе CatBoost по индексам слов (Python)
+PyModels/wr_keras.py - решатель на базе feed forward нейросетки, реализованной на Keras (Python)
+PyModels/wr_lasagne.py - решатель на базе feed forward нейросетки, реализованной на Lasagne (Theano, Python)
+CSharpModels/WithAccordNet/Program.cs - решатель на базе feed forward сетки Accord.NET (C#, проект для VS 2015)
+
+Внутренние классы и инструменты:  
+PyModels/DatasetVectorizers.py - векторизаторы датасета и фабрика для удобного выбора
+
+
+
+
+## Формат корпуса
+
+Все варианты бенчмарка используют тектовый файл в кодировке utf-8 для получения
+списков N-грамм. Предполагается, что разбивка текста на слова и приведение к нижнему
+регистру выполнены заранее сторонним кодом. Поэтому скрипты читают строки из этого файла,
+разбивают их на слова по пробелам.
+
+
+## Грамматический словарь
+
+В варианте векторизации w2v_tags к w2v-векторам слов добавляются морфологические признаки.
+Эти признаки для каждого слова берутся из упакованного файла word2tags_bin.zip в подкаталоге data,
+который получен конвертацией моего грамматического словаря (http://solarix.ru/sql-dictionary-sdk.shtml).
+Результат конвертации тянет на 165 Мб, что многовато для git репозитория. Поэтому я 
+зазиповал получившимйся файл грамматического словаря, а соответствующий класс
+векторизации датасета сам распаковывает его на лету во время работы.
 
 
 ## Текущие результаты
 
-word2vector - 0.80  
-brown clustering - 0.70  
-char one-hot encoding - 0.71  
-random bit vectors (доля единиц 16%) - 0.696  
-hashing trick with 32,000 slots - 0.64  
+Для решателя на базе XGBoost:
 
+word2vector + morph tags ==> 0.81
+word2vector ==> 0.80  
+brown clustering ==> 0.70  
+char one-hot encoding ==> 0.71  
+random bit vectors (доля единиц 16%) ==> 0.696  
+hashing trick with 32,000 slots ==> 0.64  
+
+Для решателя на базе Keras feed forward neural net:
+
+word2vector ==> 0.80
+
+Для решателя на базе Lasagne MLP:
+
+accuracy=0.71
+
+Для решателя на базе Accord.NET feed forward neural net:
+
+word2vector ==> 0.68
+
+Для решателя на базе CatBoost по категориальным признакам "индекс слова":
+
+accuracy=0.50
 
 Дополнительные подробности см. тут http://kelijah.livejournal.com/217608.html
