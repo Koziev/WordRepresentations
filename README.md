@@ -41,14 +41,14 @@
 ## Модули и решатели
 
 Запускаемые программы:  
-PyModels/wr_xgboost.py - решатель на базе XGBoost (Python)
-PyModels/wr_catboost.py - решатель на базе CatBoost по индексам слов (Python)
-PyModels/wr_keras.py - решатель на базе feed forward нейросетки, реализованной на Keras (Python)
-PyModels/wr_lasagne.py - решатель на базе feed forward нейросетки, реализованной на Lasagne (Theano, Python)
-CSharpModels/WithAccordNet/Program.cs - решатель на базе feed forward сетки Accord.NET (C#, проект для VS 2015)
+PyModels/wr_xgboost.py - решатель на базе XGBoost (Python)  
+PyModels/wr_catboost.py - решатель на базе CatBoost по индексам слов (Python)  
+PyModels/wr_keras.py - решатель на базе feed forward нейросетки, реализованной на Keras (Python)  
+PyModels/wr_lasagne.py - решатель на базе feed forward нейросетки, реализованной на Lasagne (Theano, Python)  
+CSharpModels/WithAccordNet/Program.cs - решатель на базе feed forward сетки Accord.NET (C#, проект для VS 2015)  
 
 Внутренние классы и инструменты:  
-PyModels/DatasetVectorizers.py - векторизаторы датасета и фабрика для удобного выбора
+PyModels/DatasetVectorizers.py - векторизаторы датасета и фабрика для удобного выбора  
 
 
 
@@ -75,7 +75,7 @@ PyModels/DatasetVectorizers.py - векторизаторы датасета и 
 
 Для решателя на базе XGBoost:
 
-word2vector + morph tags ==> 0.81
+word2vector + morph tags ==> 0.81  
 word2vector ==> 0.80  
 brown clustering ==> 0.70  
 char one-hot encoding ==> 0.71  
@@ -84,18 +84,18 @@ hashing trick with 32,000 slots ==> 0.64
 
 Для решателя на базе Keras feed forward neural net:
 
-word2vector ==> 0.80
+word2vector ==> 0.80  
 
 Для решателя на базе Lasagne MLP:
 
-accuracy=0.71
+accuracy=0.71  
 
 Для решателя на базе Accord.NET feed forward neural net:
 
-word2vector ==> 0.68
+word2vector ==> 0.68  
 
 Для решателя на базе CatBoost по категориальным признакам "индекс слова":
 
-accuracy=0.50
+accuracy=0.50  
 
 Дополнительные подробности см. тут http://kelijah.livejournal.com/217608.html
