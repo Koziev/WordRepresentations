@@ -56,8 +56,10 @@ class BaseVectorizer(object):
         pass
 
     def _get_corpus_path(self):
-        # путь к текстовому корпусу, из которого берутся N-граммы
-        corp_path = 'F:/Corpus/word2vector/ru/SENTx.corpus.w2v.txt'
+        # Путь к текстовому корпусу, из которого берутся N-граммы.
+        # Для удобства работы с git репозиторием, корпус сжат, поэтому мы
+        # возвращаем путь к архиву.
+        corp_path = '../data/corpus.txt.zip'
         return corp_path
 
     def vectorize_dataset(self):
@@ -110,39 +112,43 @@ class BaseVectorizer(object):
         MAX_NB_1_NGRAMS = NB_SAMPLES / 2
 
         print('Extracting {}-grams from {}...'.format(NGRAM_ORDER, self._get_corpus_path()))
-        with codecs.open(self._get_corpus_path(), "r", "utf-8") as rdr:
-            nline = 0
-            for line in rdr:
-                nline += 1
-                if (nline % 10000) == 0:
-                    print('{0} lines, {1} ngrams'.format(nline, len(valid_ngrams)), end='\r')
+#        with codecs.open(self._get_corpus_path(), "r", "utf-8") as rdr:
 
-                words = line.strip().split(u' ')
+        with zipfile.ZipFile(self._get_corpus_path()) as z:
+            with z.open('corpus.txt') as rdr:
+                nline = 0
+                for line0 in rdr:
+                    line = line0.decode('utf-8')
+                    nline += 1
+                    if (nline % 10000) == 0:
+                        print('{0} lines, {1} ngrams'.format(nline, len(valid_ngrams)), end='\r')
 
-                all_words_known = True
-                for word in words:
-                    if valid_words is None or word in valid_words:
-                        all_words.add(word)
+                    words = line.strip().split(u' ')
 
-                ngrams = get_ngrams(words, NGRAM_ORDER)
-                for ngram in ngrams:
-                    if ngram not in valid_ngrams and ngram not in invalid_ngrams:
-                        all_words_known = True
-                        for word in ngram:
-                            if word not in all_words:
-                                all_words_known = False
-                                break
+                    all_words_known = True
+                    for word in words:
+                        if valid_words is None or word in valid_words:
+                            all_words.add(word)
 
-                        if all_words_known:
-                            if len(valid_ngrams) < MAX_NB_1_NGRAMS:
-                                valid_ngrams.add(ngram)
+                    ngrams = get_ngrams(words, NGRAM_ORDER)
+                    for ngram in ngrams:
+                        if ngram not in valid_ngrams and ngram not in invalid_ngrams:
+                            all_words_known = True
+                            for word in ngram:
+                                if word not in all_words:
+                                    all_words_known = False
+                                    break
+
+                            if all_words_known:
+                                if len(valid_ngrams) < MAX_NB_1_NGRAMS:
+                                    valid_ngrams.add(ngram)
+                                else:
+                                    break
                             else:
-                                break
-                        else:
-                            invalid_ngrams.add(ngram)
+                                invalid_ngrams.add(ngram)
 
-                if len(valid_ngrams) >= MAX_NB_1_NGRAMS:
-                    break
+                    if len(valid_ngrams) >= MAX_NB_1_NGRAMS:
+                        break
 
         print(
             'Finished, {0} lines, {1} {2}-grams, {3} words.'.format(nline, len(valid_ngrams), NGRAM_ORDER, len(all_words)))
@@ -158,8 +164,10 @@ class BaseVectorizer(object):
     @classmethod
     def get_dataset_generator(self, representation_name):
         """
-        Фабрика для генераторов датасетов. Класс, который будет выполнять векторизацию, ищется
-        по заданной условной строковой метке. Эту же метку возвращает метод get_name() в классах-векторизаторах.
+        Фабричный метод для получения генератора датасетов.
+        Класс, который будет выполнять векторизацию текстового корпуса,
+        ищется по заданной условной строковой метке. Эту же метку возвращает
+        метод get_name() в классах-векторизаторах.
 
         :param representation_name: наименование способа представления слов
         :return: объект класса, производного от BaseVectorizer, который будет выполнять генерацию матриц датасета.
