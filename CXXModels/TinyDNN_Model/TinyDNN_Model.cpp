@@ -117,13 +117,13 @@ int main(int argc, char** argv)
 		const size_t output_size = 2;
 
 		const int nb_epochs = 100;
-		const size_t batch_size = 1;
+		const size_t batch_size = 128;
 
 		auto nn = make_mlp<sigmoid_layer>({ input_size, num_hidden_units, output_size });
 
 		gradient_descent optimizer;
 
-		optimizer.alpha = 0.001;
+		optimizer.alpha = 0.1;
 
 		progress_display disp(X_train.size());
 		timer t;
