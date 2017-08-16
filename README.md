@@ -115,4 +115,9 @@ word2vector ==> 0.68
 
 accuracy=0.50  
 
+Для решателя на базе Apache.SINGA MLP:  
+
+accuracy=0.74  
+
+
 Дополнительные подробности см. тут http://kelijah.livejournal.com/217608.html
