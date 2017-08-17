@@ -6,7 +6,7 @@
 в упрощенной задаче построения так называемой language model (https://en.wikipedia.org/wiki/Language_model).
 
 Есть N-грамма заранее выбранной длины (см. константу NGRAM_ORDER 
-в модуле DatasetVectorizers). Если она получена из текстового корпуса (путь к зазипованному
+в модуле [DatasetVectorizers](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/DatasetVectorizers.py)). Если она получена из текстового корпуса (путь к зазипованному
 utf-8 файлу прошит в методе _get_corpus_path класса BaseVectorizer), то считаем, что
 это валидное сочетание слов и целевое значение y=1. Если же N-грамма получена случайной
 заменой одного из слов и такая цепочка не встречается в корпусе, то целевое значение y=0.
@@ -16,8 +16,8 @@ utf-8 файлу прошит в методе _get_corpus_path класса Base
 позволяет легко "играться" таким параметром, как количество записей в обучающем датасете.
 
 Таким образом, решается бинарная классификационная задача. Классификатором будет реализация
-градиентного бустинга XGBoost и нейросеть, реализованная на Keras или других сравниваемых
-библиотеках.
+градиентного бустинга XGBoost и нейросеть, реализованная на Keras, а также несколько
+других вариантов на разных языках программирования и DL фреймворках.
 
 Объектом исследования является влияние способа представления слов во входной матрице X
 на точность классификации.
@@ -42,22 +42,22 @@ utf-8 файлу прошит в методе _get_corpus_path класса Base
 
 ## Модули и решатели
 
-*Запускаемые программы на Python:*  
+**Запускаемые программы на Python:**  
 [PyModels/wr_xgboost.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_xgboost.py) - решатель на базе XGBoost (Python)  
 [PyModels/wr_catboost.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_catboost.py) - решатель на базе CatBoost по индексам слов, использующий возможность указать индексы категориальных признаков в датасете, чтобы бустер самостоятельно учел их при тренировке (Python)  
 [PyModels/wr_keras.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_keras.py) - решатель на базе feed forward нейросетки, реализованной на Keras (Python)  
 [PyModels/wr_lasagne.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_lasagne.py) - решатель на базе feed forward нейросетки, реализованной на Lasagne (Theano, Python)  
 [PyModels/wr_nolearn.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_nolearn.py) - решатель на базе feed forward нейросетки, реализованной на nolearn+Lasagne (Theano, Python)  
 
-*Компилируемые программы на C#:*  
+**Компилируемые программы на C#:**  
 [CSharpModels/WithAccordNet/Program.cs](https://github.com/Koziev/WordRepresentations/blob/master/CSharpModels/WithAccordNet/Program.cs) - решатель на базе feed forward сетки Accord.NET (C#, проект для VS 2015)  
 
-*Компилируемые программы на C++:*  
+**Компилируемые программы на C++:**  
 [CXXModels/TinyDNN_Model/TinyDNN_Model.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/TinyDNN_Model/TinyDNN_Model.cpp) - решатель на базе MLP, реализованного средствами библиотеки tiny-dnn (C++, проект для VS 2015)  
 [CXXModels/Singa_Model/alexnet.cc](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/Singa_Model/alexnet.cc) - решатель на базе нейросетки, реализованной средствами Apache.SINGA (C++, проект для VS 2015)  
 [CXXModels/OpenNN_Model/main.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/OpenNN_Model/main.cpp) - решатель на базе нейросетки, реализованной средствами OpenNN (C++, проект для VS 2015)  
 
-Внутренние классы и инструменты:  
+**Внутренние классы и инструменты:**  
 PyModels/DatasetVectorizers.py - векторизаторы датасета и фабрика для удобного выбора векторизатора по его условному названию  
 PyModels/store_dataset_file.py - генерация датасета и его сохранение для C# и C++ моделей  
 
