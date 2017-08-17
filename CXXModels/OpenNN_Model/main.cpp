@@ -72,7 +72,9 @@ int main(void)
 
 		training_strategy.set(&loss_index);
 
-		training_strategy.get_quasi_Newton_method_pointer()->set_maximum_iterations_number(50);
+		training_strategy.get_quasi_Newton_method_pointer()->set_maximum_iterations_number(1000);
+		training_strategy.get_quasi_Newton_method_pointer()->set_maximum_time(3600);
+		training_strategy.get_quasi_Newton_method_pointer()->set_display_period(1);
 
 		training_strategy.perform_training();
 
