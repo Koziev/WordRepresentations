@@ -42,16 +42,20 @@ utf-8 файлу прошит в методе _get_corpus_path класса Base
 
 ## Модули и решатели
 
-Запускаемые программы:  
-PyModels/wr_xgboost.py - решатель на базе XGBoost (Python)  
-PyModels/wr_catboost.py - решатель на базе CatBoost по индексам слов, использующий возможность указать индексы категориальных признаков в датасете, чтобы бустер самостоятельно учел их при тренировке (Python)  
-PyModels/wr_keras.py - решатель на базе feed forward нейросетки, реализованной на Keras (Python)  
-PyModels/wr_lasagne.py - решатель на базе feed forward нейросетки, реализованной на Lasagne (Theano, Python)  
-PyModels/wr_nolearn.py - решатель на базе feed forward нейросетки, реализованной на nolearn+Lasagne (Theano, Python)  
+*Запускаемые программы на Python:*  
+[PyModels/wr_xgboost.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_xgboost.py) - решатель на базе XGBoost (Python)  
+[PyModels/wr_catboost.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_catboost.py) - решатель на базе CatBoost по индексам слов, использующий возможность указать индексы категориальных признаков в датасете, чтобы бустер самостоятельно учел их при тренировке (Python)  
+[PyModels/wr_keras.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_keras.py) - решатель на базе feed forward нейросетки, реализованной на Keras (Python)  
+[PyModels/wr_lasagne.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_lasagne.py) - решатель на базе feed forward нейросетки, реализованной на Lasagne (Theano, Python)  
+[PyModels/wr_nolearn.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_nolearn.py) - решатель на базе feed forward нейросетки, реализованной на nolearn+Lasagne (Theano, Python)  
+
+*Компилируемые программы на C#:*  
 [CSharpModels/WithAccordNet/Program.cs](https://github.com/Koziev/WordRepresentations/blob/master/CSharpModels/WithAccordNet/Program.cs) - решатель на базе feed forward сетки Accord.NET (C#, проект для VS 2015)  
-[CXXModels/TinyDNN_Model/TinyDNN_Model.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/TinyDNN_Model/TinyDNN_Model.cpp) - решатель на базе MLP, реализованного средствами библиотеки tiny-dnn (C++, проект для VS 2015)
-[CXXModels/Singa_Model/alexnet.cc](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/Singa_Model/alexnet.cc) - решатель на базе нейросетки, реализованной средствами Apache.SINGA (C++, проект для VS 2015)
-[CXXModels/OpenNN_Model/main.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/OpenNN_Model/main.cpp) - решатель на базе нейросетки, реализованной средствами OpenNN (C++, проект для VS 2015).
+
+*Компилируемые программы на C++:*  
+[CXXModels/TinyDNN_Model/TinyDNN_Model.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/TinyDNN_Model/TinyDNN_Model.cpp) - решатель на базе MLP, реализованного средствами библиотеки tiny-dnn (C++, проект для VS 2015)  
+[CXXModels/Singa_Model/alexnet.cc](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/Singa_Model/alexnet.cc) - решатель на базе нейросетки, реализованной средствами Apache.SINGA (C++, проект для VS 2015)  
+[CXXModels/OpenNN_Model/main.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/OpenNN_Model/main.cpp) - решатель на базе нейросетки, реализованной средствами OpenNN (C++, проект для VS 2015)  
 
 Внутренние классы и инструменты:  
 PyModels/DatasetVectorizers.py - векторизаторы датасета и фабрика для удобного выбора векторизатора по его условному названию  
