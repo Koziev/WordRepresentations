@@ -126,6 +126,6 @@ accuracy=0.50
 accuracy=0.74  
 
 
-Дополнительные подробности:
-https://habrahabr.ru/post/335838/
-http://kelijah.livejournal.com/217608.html
+## Дополнительные подробности:  
+https://habrahabr.ru/post/335838/  
+http://kelijah.livejournal.com/217608.html  
