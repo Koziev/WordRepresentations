@@ -196,7 +196,9 @@ class W2V_Vectorizer(BaseVectorizer):
 
     def _load_w2v(self):
         # путь к word2vec модели
-        w2v_path = r'F:\Word2Vec\word_vectors_cbow=1_win=5_dim=32.txt'
+        # TODO: вынести в конфигурацию
+        #w2v_path = r'F:\Word2Vec\word_vectors_cbow=1_win=5_dim=32.txt'
+        w2v_path = r'/home/eek/polygon/w2v/word_vectors_cbow=1_win=5_dim=32.txt'
         print('Loading w2v model...')
         w2v = gensim.models.KeyedVectors.load_word2vec_format(w2v_path, binary=False)
         return w2v
@@ -223,6 +225,62 @@ class W2V_Vectorizer(BaseVectorizer):
         for idata, ngram in enumerate(dataset_x):
             for iword, word in enumerate(ngram):
                 X_data[idata, iword * vec_len:(iword + 1) * vec_len] = w2v[word]
+
+        return (X_data, y_data)
+
+# -------------------------------------------------------------------
+
+
+class SDR_Vectorizer(BaseVectorizer):
+    """
+    В качестве репрезентаций слов берем их sparse distributed representations.
+    Векторы слов в N-грамме склеиваются в один вектор.
+    """
+    def __init__(self):
+        super(SDR_Vectorizer,self).__init__()
+
+    @classmethod
+    def get_name(self):
+        return 'sdr'
+
+    def _load_sdr(self):
+        # путь к подготовленным SDR слов
+        # TODO: вынести в конфигурацию
+        sdr_path = r'/home/eek/polygon/w2v_binarizarion/mfaruqui/sparse-coding/out_vecs.txt'
+        print('Loading SDRs...')
+
+        word2sdr = dict()
+        with codecs.open(sdr_path, 'r', 'utf-8') as rdr:
+            for line in rdr:
+                tx = line.strip().split()
+                word = tx[0]
+                vec = [ (True if float(z)>0.0 else False) for z in tx[1:] ]
+                vec = np.asarray(vec, dtype='float32')
+                word2sdr[word] = vec
+
+        return (set(word2sdr.keys()), word2sdr)
+
+    def vectorize_dataset(self):
+        (valid_words,word2sdr) = self._load_sdr()
+
+        (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words)
+
+        # -------------------------------------------------------------------
+
+        y_data = np.zeros((NB_SAMPLES), dtype='bool')
+        y_data[:] = dataset_y[:]
+
+        nword = len(valid_words)
+        print('Number of words={0}'.format(nword))
+        vec_len = len( word2sdr.values()[0] )
+        print('Vector length={0}'.format(vec_len))
+
+        input_size = vec_len * NGRAM_ORDER
+        X_data = np.zeros((NB_SAMPLES, input_size), dtype='float32')
+
+        for idata, ngram in enumerate(dataset_x):
+            for iword, word in enumerate(ngram):
+                X_data[idata, iword * vec_len:(iword + 1) * vec_len] = word2sdr[word]
 
         return (X_data, y_data)
 
