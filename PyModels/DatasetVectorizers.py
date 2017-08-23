@@ -13,14 +13,13 @@ import collections
 import math
 import random
 from scipy.sparse import lil_matrix
-import xgboost
 import sklearn.model_selection
 from itertools import chain
 import sys
 import zipfile
 
 # арность N-грамм
-NGRAM_ORDER = 3
+NGRAM_ORDER = 4
 
 # кол-во сэмплов в датасете
 NB_SAMPLES = 1000000
@@ -197,8 +196,8 @@ class W2V_Vectorizer(BaseVectorizer):
     def _load_w2v(self):
         # путь к word2vec модели
         # TODO: вынести в конфигурацию
-        #w2v_path = r'F:\Word2Vec\word_vectors_cbow=1_win=5_dim=32.txt'
-        w2v_path = r'/home/eek/polygon/w2v/word_vectors_cbow=1_win=5_dim=32.txt'
+        w2v_path = r'F:\Word2Vec\word_vectors_cbow=1_win=5_dim=32.txt'
+        #w2v_path = r'/home/eek/polygon/w2v/word_vectors_cbow=1_win=5_dim=32.txt'
         print('Loading w2v model...')
         w2v = gensim.models.KeyedVectors.load_word2vec_format(w2v_path, binary=False)
         return w2v
@@ -604,4 +603,65 @@ class W2V_Tags_Vectorizer(W2V_Vectorizer):
                     X_data[idata, i0 + iword*tags_per_word+ tag_id] = 1.0
 
         return (X_data, y_data)
+# -------------------------------------------------------------------
+
+class WordFreqs_Vectorizer(BaseVectorizer):
+    """
+    В качестве репрезентаций слов берем их частоту - получается одномерное представление.
+    Данное представление используется для проверки гипотезы касательно результатов
+    использования индексов слов в качестве категориальных признаков.
+    """
+    def __init__(self):
+        super(WordIndeces_Vectorizer,self).__init__()
+        self.all_words = []
+
+    @classmethod
+    def get_name(self):
+        return 'word_freq'
+
+    @property
+    def nb_words(self):
+        return len(self.all_words)
+
+    def vectorize_dataset(self):
+
+        print('Counting word occurencies in {}...'.format(self._get_corpus_path()))
+        word2freq = collections.Counter()
+
+        with zipfile.ZipFile(self._get_corpus_path()) as z:
+            with z.open('corpus.txt') as rdr:
+                nline = 0
+                for line0 in rdr:
+                    line = line0.decode('utf-8')
+                    nline += 1
+                    if (nline % 10000) == 0:
+                        print('{0} lines, {1} words'.format(nline, len(word2freq)), end='\r')
+
+                    words = line.strip().split(u' ')
+                    word2freq.update(words)
+
+
+        print(
+            'Finished, {0} lines, {1} words.'.format(nline, len(word2freq)))
+
+        sum_freq = sum(word2freq.values())
+
+        (self.all_words, dataset_x, dataset_y) = self._load_ngrams(None)
+
+        word2y = dict([(w,cnt/float(sum_freq)) for w,cnt in word2freq])
+
+        # -------------------------------------------------------------------
+
+        y_data = np.zeros((NB_SAMPLES), dtype='bool')
+        y_data[:] = dataset_y[:]
+
+        input_size = NGRAM_ORDER
+        X_data = np.zeros((NB_SAMPLES, input_size), dtype='int32')
+
+        for idata, ngram in enumerate(dataset_x):
+            for iword, word in enumerate(ngram):
+                X_data[idata, iword ] = word2y[word]
+
+        return (X_data, y_data)
+
 

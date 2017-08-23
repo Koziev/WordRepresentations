@@ -36,7 +36,7 @@ D_holdout = xgboost.DMatrix(X_holdout, y_holdout)
 
 xgb_params = dict()
 xgb_params['eta'] = 0.1
-xgb_params['max_depth'] = 6
+xgb_params['max_depth'] = 7
 xgb_params['subsample'] = 0.85
 xgb_params['min_child_weight'] = 3
 xgb_params['gamma'] = 0.05
