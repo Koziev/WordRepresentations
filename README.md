@@ -87,6 +87,12 @@ PyModels/store_dataset_file.py - генерация датасета и его �
 зазиповал получившимйся файл грамматического словаря, а соответствующий класс
 векторизации датасета сам распаковывает его на лету во время работы.
 
+Обратите внимание, что из-за омонимии грамматических форм многие слова имеют более
+одного варианта набора тегов. Например, слово 'мишки' может быть формой единственного
+или множественного числа соответственно в родительном или именительном падеже. При формировании
+наборов тегов для слов я объединяю теги омонимов.
+
+
 ## Получение sparse distributed representation для слов
 
 Используется двухэтапный процесс.
@@ -100,20 +106,83 @@ PyModels/store_dataset_file.py - генерация датасета и его �
 Генерируется файл out_vecs.txt, содержащий SDR слов с указанными параметрами: размер=16*длина вектора w2v, заполнение=0.2
 Этот файл грузится классом SDR_Vectorizer.
 
+
+## Baseline  
+
+В качестве проверки используем запоминание N-грамм из тренировочного набора и
+поиск среди запомненных N-грамм для проверочного набора. Небольшой размер тренировочного
+набора приводит к тому, что на проверочном наборе модель ведет себя просто как рандомный
+угадыватель, давая точность 0.50.
+
+
 ## Текущие результаты
 
-Для решателя на базе XGBoost:
+Далее представлены результаты для датасета, содержащего 1,000,000 триграмм.
 
-word2vector + morph tags ==> 0.81  
-word2vector ==> 0.80  
-brown clustering ==> 0.70  
-char one-hot encoding ==> 0.71  
-random bit vectors (доля единиц 16%) ==> 0.696  
-hashing trick with 32,000 slots ==> 0.64  
+Для решателя на базе XGBoost (wr_xgboost.py):
 
-Для решателя на базе Keras feed forward neural net:
+w2v_tags (word2vector + morph tags) ==> 0.81  
+w2v (word2vector dim=32) ==> 0.80  
+sdr (sparse distributed representations, длина 512, 20% единиц) ==> 0.78
+bc (brown clustering) ==> 0.70  
+chars (char one-hot encoding) ==> 0.71  
+random_bitvector (random bit vectors, доля единиц 16%) ==> 0.696  
+hashing_trick (hashing trick with 32,000 slots) ==> 0.64  
 
-word2vector ==> 0.80  
+
+Для решателя на базе Keras feed forward neural net (wr_keras.py):  
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=2  w2v_tags  acc=0.8340  
+NB_SAMPLES=2,000,000  NGRAM_ORDER=2  w2v_tags  acc=0.8405  
+NB_SAMPLES=3,000,000  NGRAM_ORDER=2  w2v_tags  acc=0.8474  
+NB_SAMPLES=5,000,000  NGRAM_ORDER=2  w2v_tags  acc=0.8511  
+NB_SAMPLES=10,000,000 NGRAM_ORDER=2  w2v_tags  acc=0.8561  
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=2  word_indeces  acc=0.7452  
+NB_SAMPLES=2,000,000  NGRAM_ORDER=2  word_indeces  acc=0.7619  
+NB_SAMPLES=3,000,000  NGRAM_ORDER=2  word_indeces  acc=0.7735  
+NB_SAMPLES=5,000,000  NGRAM_ORDER=2  word_indeces  acc=0.7835  
+NB_SAMPLES=6,000,000  NGRAM_ORDER=2  word_indeces  acc=0.7849  
+NB_SAMPLES=10,000,000 NGRAM_ORDER=2  word_indeces  acc=0.8103  
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=2  w2v  acc=0.7954  
+NB_SAMPLES=2,000,000  NGRAM_ORDER=2  w2v  acc=0.8010  
+NB_SAMPLES=3,000,000  NGRAM_ORDER=2  w2v  acc=0.8050  
+NB_SAMPLES=5,000,000  NGRAM_ORDER=2  w2v  acc=0.8065  
+NB_SAMPLES=6,000,000  NGRAM_ORDER=2  w2v  acc=0.8086  
+NB_SAMPLES=10,000,000 NGRAM_ORDER=2  w2v  acc=0.8132  
+
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8528  
+NB_SAMPLES=2,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8585  
+NB_SAMPLES=3,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8662  
+NB_SAMPLES=5,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8738  
+NB_SAMPLES=6,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8760  
+NB_SAMPLES=8,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8774  
+
+                      
+NB_SAMPLES=1,000,000  NGRAM_ORDER=3  word_indeces  acc=0.7719  
+NB_SAMPLES=2,000,000  NGRAM_ORDER=3  word_indeces  acc=0.7807  
+NB_SAMPLES=3,000,000  NGRAM_ORDER=3  word_indeces  acc=0.7875  
+NB_SAMPLES=5,000,000  NGRAM_ORDER=3  word_indeces  acc=0.8250  
+NB_SAMPLES=6,000,000  NGRAM_ORDER=3  word_indeces  acc=0.8266  
+NB_SAMPLES=8,000,000  NGRAM_ORDER=3  word_indeces  acc=0.8328  
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=3  w2v  acc=0.8116  
+NB_SAMPLES=2,000,000  NGRAM_ORDER=3  w2v  acc=0.8140  
+NB_SAMPLES=3,000,000  NGRAM_ORDER=3  w2v  acc=0.8191  
+NB_SAMPLES=5,000,000  NGRAM_ORDER=3  w2v  acc=0.8280  
+NB_SAMPLES=6,000,000  NGRAM_ORDER=3  w2v  acc=0.8275  
+NB_SAMPLES=8,000,000  NGRAM_ORDER=3  w2v  acc=0.8289  
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8376  
+NB_SAMPLES=2,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8575  
+NB_SAMPLES=3,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8701  
+NB_SAMPLES=5,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8789  
+NB_SAMPLES=6,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8751  
+NB_SAMPLES=8,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8805  
+
+
 
 Для решателя на базе Lasagne MLP:
 
@@ -138,6 +207,10 @@ accuracy=0.50
 Для решателя на базе Apache.SINGA MLP:  
 
 accuracy=0.74  
+
+Baseline решение - запоминание N-грамм из тренировочного датасета
+
+accuracy=0.50
 
 
 ## Дополнительные подробности:  
