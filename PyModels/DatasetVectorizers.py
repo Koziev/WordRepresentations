@@ -22,7 +22,7 @@ import zipfile
 NGRAM_ORDER = 4
 
 # кол-во сэмплов в датасете
-NB_SAMPLES = 1000000
+NB_SAMPLES = 6000000
 
 # -------------------------------------------------------------------
 
@@ -103,10 +103,10 @@ class BaseVectorizer(object):
         return (dataset_x, dataset_y)
 
     def _load_ngrams(self, valid_words):
+        self.ngram_arity = NGRAM_ORDER
         all_words = set()
         valid_ngrams = set()
         invalid_ngrams = set()
-
         assert (NB_SAMPLES % 2) == 0
         MAX_NB_1_NGRAMS = NB_SAMPLES / 2
 
@@ -156,6 +156,9 @@ class BaseVectorizer(object):
 
         return (all_words, dataset_x, dataset_y)
 
+    def get_ngram_arity(self):
+        return self.ngram_arity
+
     @classmethod
     def get_name(self):
         raise NotImplemented()
@@ -196,8 +199,8 @@ class W2V_Vectorizer(BaseVectorizer):
     def _load_w2v(self):
         # путь к word2vec модели
         # TODO: вынести в конфигурацию
-        w2v_path = r'F:\Word2Vec\word_vectors_cbow=1_win=5_dim=32.txt'
-        #w2v_path = r'/home/eek/polygon/w2v/word_vectors_cbow=1_win=5_dim=32.txt'
+        #w2v_path = r'F:\Word2Vec\word_vectors_cbow=1_win=5_dim=32.txt'
+        w2v_path = r'/home/eek/polygon/w2v/word_vectors_cbow=1_win=5_dim=32.txt'
         print('Loading w2v model...')
         w2v = gensim.models.KeyedVectors.load_word2vec_format(w2v_path, binary=False)
         return w2v
@@ -207,6 +210,8 @@ class W2V_Vectorizer(BaseVectorizer):
 
         valid_words = set(w2v.vocab)
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words)
+
+        assert( len(dataset_x)==NB_SAMPLES )
 
         # -------------------------------------------------------------------
 
@@ -264,6 +269,8 @@ class SDR_Vectorizer(BaseVectorizer):
 
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words)
 
+        assert( len(dataset_x)==NB_SAMPLES )
+
         # -------------------------------------------------------------------
 
         y_data = np.zeros((NB_SAMPLES), dtype='bool')
@@ -300,6 +307,8 @@ class BinaryWord_Vectorizer(BaseVectorizer):
     def vectorize_dataset(self):
 
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words=None)
+
+        assert( len(dataset_x)==NB_SAMPLES )
 
         nb_words = len(all_words)
 
@@ -365,6 +374,8 @@ class BrownClusters_Vectorizer(BaseVectorizer):
         valid_words = set( w2bc.keys() )
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words)
 
+        assert( len(dataset_x)==NB_SAMPLES )
+
         vec_len = max( len(c) for c in w2bc.values() )
         print('Vector length={0}'.format(vec_len))
 
@@ -403,6 +414,8 @@ class Chars_Vectorizer(BaseVectorizer):
 
     def vectorize_dataset(self):
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words=None)
+
+        assert( len(dataset_x)==NB_SAMPLES )
 
         nb_words = len(all_words)
 
@@ -450,6 +463,8 @@ class HashingTrick_Vectorizer(BaseVectorizer):
 
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words=None)
 
+        assert( len(dataset_x)==NB_SAMPLES )
+
         NB_SLOTS = 32000 # столько элементов будет в хэш-таблице, так что
                          # некоторое количество слов будут давать коллизии
         hash_dict = gensim.corpora.hashdictionary.HashDictionary( id_range=NB_SLOTS, debug=True)
@@ -492,6 +507,8 @@ class WordIndeces_Vectorizer(BaseVectorizer):
     def vectorize_dataset(self):
 
         (self.all_words, dataset_x, dataset_y) = self._load_ngrams(None)
+        assert( len(dataset_x)==NB_SAMPLES )
+
         word2id = dict([(w,i) for i,w in enumerate(self.all_words)])
 
         # -------------------------------------------------------------------
@@ -576,6 +593,8 @@ class W2V_Tags_Vectorizer(W2V_Vectorizer):
         valid_words = set(w2v.vocab) & tagged_words
 
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words)
+
+        assert( len(dataset_x)==NB_SAMPLES )
 
         # -------------------------------------------------------------------
 

@@ -2,39 +2,52 @@
 '''
 Головной решатель на базе нейросетки keras для бенчмарка эффективности разных word representation
 в задаче определения допустимости N-граммы.
+
+Реализованы следующие архитектуры нейросети:
+MLP - простая feedforward сетка
+ConvNet - сверточные слои
+
 (c) Козиев Илья inkoziev@gmail.com
 '''
 
 from __future__ import print_function
 import gc
-import sklearn.model_selection
+import sklearn
+#import sklearn.model_selection
 from keras.layers import Dense, Dropout, Input, Flatten
+from keras.layers.core import Reshape
+from keras.layers.merge import concatenate
 from keras.layers import Embedding
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.layers.normalization import BatchNormalization
 from keras.models import Model
+from keras.layers import Conv1D, GlobalMaxPooling1D, GlobalAveragePooling1D, MaxPooling1D, AveragePooling1D
 from DatasetVectorizers import BaseVectorizer
 from DatasetSplitter import split_dataset
 
 
 
 REPRESENTATIONS = 'w2v_tags' # 'word_indeces' | 'w2v' | 'w2v_tags'
+NET_ARCH = 'ConvNet' # 'MLP' | 'ConvNet'
 
+# -----------------------------------------------------------------------
 
 dataset_generator = BaseVectorizer.get_dataset_generator(REPRESENTATIONS)
 X_data,y_data = dataset_generator.vectorize_dataset()
 X_train,  y_train, X_val, y_val, X_holdout, y_holdout = split_dataset(X_data, y_data )
+ngram_arity = dataset_generator.get_ngram_arity()
 
 print('X_train.shape={} X_val.shape={} X_holdout.shape={}'.format(X_train.shape, X_val.shape, X_holdout.shape))
 
 gc.collect()
 
+use_conv = NET_ARCH=='ConvNet'
 net = None
 
 if REPRESENTATIONS=='word_indeces':
     input_word_dims = 32
     nb_words = dataset_generator.nb_words
-    ngram_arity = X_train.shape[1]
+    ndense = ngram_arity*input_word_dims
 
     embedding_layer = Embedding(output_dim=input_word_dims,
                                 input_dim=nb_words,
@@ -44,34 +57,143 @@ if REPRESENTATIONS=='word_indeces':
 
     x_input = Input(shape=(ngram_arity,), dtype='int32')
     emb = embedding_layer(x_input)
-    net = Flatten()(emb)
 
-    ndense = ngram_arity*input_word_dims
+    if use_conv:
+        print('Building ConvNet...')
+        nets = []
 
-    net = Dense( units=ndense, activation='relu' )(net)
-    net = BatchNormalization()(net)
-    net = Dense( units=int(ndense/2), activation='relu' )(net)
-    net = BatchNormalization()(net)
-    net = Dense( units=int(ndense/3), activation='relu' )(net)
-    net = BatchNormalization()(net)
-    #net = Dense( units=int(ndense/4), activation='relu' )(net)
-    #net = BatchNormalization()(net)
+        conv_layer0 = Conv1D(filters=input_word_dims,
+                             kernel_size=1,
+                             padding='valid',
+                             activation='relu',
+                             strides=1)
+        net0 = conv_layer0(emb)
+        net0 = GlobalMaxPooling1D()(net0)
+        nets.append( net0 )
 
-    net = Dense( units=1, activation='sigmoid' )(net)
+        conv_layer1 = Conv1D(filters=input_word_dims,
+                             kernel_size=2,
+                             padding='valid',
+                             activation='relu',
+                             strides=1)
+        net1 = conv_layer1(emb)
+        net1 = GlobalMaxPooling1D()(net1)
+        nets.append( net1 )
+
+        if ngram_arity>=3:
+            conv_layer2 = Conv1D(filters=input_word_dims,
+                                 kernel_size=3,
+                                 padding='valid',
+                                 activation='relu',
+                                 strides=1)
+
+            net2 = conv_layer2(emb)
+            net2 = GlobalMaxPooling1D()(net2)
+            nets.append( net2 )
+
+        if ngram_arity >= 4:
+            conv_layer3 = Conv1D(filters=input_word_dims,
+                                 kernel_size=4,
+                                 padding='valid',
+                                 activation='relu',
+                                 strides=1)
+
+            net3 = conv_layer3(emb)
+            net3 = GlobalMaxPooling1D()(net3)
+            nets.append(net3)
+
+        net = concatenate(nets)
+
+        net = Dense( units=int(input_word_dims/2), activation='relu' )(net)
+        net = BatchNormalization()(net)
+        net = Dense( units=int(input_word_dims/3), activation='relu' )(net)
+        net = BatchNormalization()(net)
+        net = Dense( units=1, activation='sigmoid' )(net)
+
+    else:
+        print('Building MLP...')
+        net = Flatten()(emb)
+        net = Dense( units=ndense, activation='relu' )(net)
+        net = BatchNormalization()(net)
+        net = Dense( units=int(ndense/2), activation='relu' )(net)
+        net = BatchNormalization()(net)
+        net = Dense( units=int(ndense/3), activation='relu' )(net)
+        net = BatchNormalization()(net)
+        #net = Dense( units=int(ndense/4), activation='relu' )(net)
+        #net = BatchNormalization()(net)
+        net = Dense( units=1, activation='sigmoid' )(net)
 else:
     input_size = X_train.shape[1]
     x_input = Input(shape=(input_size,), dtype='float32')
     ndense = input_size
 
-    net = Dense( units=ndense, activation='relu' )(x_input)
-    net = BatchNormalization()(net)
-    net = Dense( units=int(ndense/2), activation='relu' )(net)
-    net = BatchNormalization()(net)
-    net = Dense( units=int(ndense/3), activation='relu' )(net)
-    net = BatchNormalization()(net)
-    #net = Dense( units=int(ndense/4), activation='relu' )(net)
-    #net = BatchNormalization()(net)
-    net = Dense( units=1, activation='sigmoid' )(net)
+    if use_conv:
+        print('Building ConvNet...')
+
+        input_word_dims = X_train.shape[1]/ngram_arity
+        net = Reshape( (ngram_arity, input_word_dims) )(x_input)
+
+        nets = []
+
+        conv_layer0 = Conv1D(filters=input_word_dims,
+                             kernel_size=1,
+                             padding='valid',
+                             activation='relu',
+                             strides=1)
+        net0 = conv_layer0(net)
+        net0 = GlobalMaxPooling1D()(net0)
+        nets.append( net0 )
+
+        conv_layer1 = Conv1D(filters=input_word_dims,
+                             kernel_size=2,
+                             padding='valid',
+                             activation='relu',
+                             strides=1)
+        net1 = conv_layer1(net)
+        net1 = GlobalMaxPooling1D()(net1)
+        nets.append( net1 )
+
+        if ngram_arity>=3:
+            conv_layer2 = Conv1D(filters=input_word_dims,
+                                 kernel_size=3,
+                                 padding='valid',
+                                 activation='relu',
+                                 strides=1)
+
+            net2 = conv_layer2(net)
+            net2 = GlobalMaxPooling1D()(net2)
+            nets.append( net2 )
+
+        if ngram_arity >= 4:
+            conv_layer3 = Conv1D(filters=input_word_dims,
+                                 kernel_size=4,
+                                 padding='valid',
+                                 activation='relu',
+                                 strides=1)
+
+            net3 = conv_layer3(net)
+            net3 = GlobalMaxPooling1D()(net3)
+            nets.append(net3)
+
+        net = concatenate(nets)
+
+        net = Dense( units=int(input_word_dims/2), activation='relu' )(net)
+        net = BatchNormalization()(net)
+        net = Dense( units=int(input_word_dims/3), activation='relu' )(net)
+        net = BatchNormalization()(net)
+        net = Dense( units=1, activation='sigmoid' )(net)
+
+    else:
+        print('Building MLP...')
+        net = Dense( units=ndense, activation='relu' )(x_input)
+        net = BatchNormalization()(net)
+        net = Dense( units=int(ndense/2), activation='relu' )(net)
+        net = BatchNormalization()(net)
+        net = Dense( units=int(ndense/3), activation='relu' )(net)
+        net = BatchNormalization()(net)
+        #net = Dense( units=int(ndense/4), activation='relu' )(net)
+        #net = BatchNormalization()(net)
+        net = Dense( units=1, activation='sigmoid' )(net)
 
 
 model = Model( inputs=x_input, outputs=net )
