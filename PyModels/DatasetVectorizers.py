@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 Классы-векторизаторы датасета для программы бенчмаркинга эффективности
-разных word representation в задаче определения допустимости N-граммы.
+разных word representation в задаче определения допустимости N-граммы
+(см. https://github.com/Koziev/WordRepresentations)
 (c) Козиев Илья inkoziev@gmail.com
 '''
 
@@ -10,11 +11,12 @@ import gensim
 import numpy as np
 import codecs
 import collections
-import math
+import itertools
 import random
 from scipy.sparse import lil_matrix
-import sklearn.model_selection
 from itertools import chain
+import math
+import sklearn.model_selection
 import sys
 import zipfile
 
@@ -22,7 +24,7 @@ import zipfile
 NGRAM_ORDER = 4
 
 # кол-во сэмплов в датасете
-NB_SAMPLES = 6000000
+NB_SAMPLES = 1000000
 
 # -------------------------------------------------------------------
 
@@ -622,6 +624,7 @@ class W2V_Tags_Vectorizer(W2V_Vectorizer):
                     X_data[idata, i0 + iword*tags_per_word+ tag_id] = 1.0
 
         return (X_data, y_data)
+
 # -------------------------------------------------------------------
 
 class WordFreqs_Vectorizer(BaseVectorizer):
@@ -683,4 +686,54 @@ class WordFreqs_Vectorizer(BaseVectorizer):
 
         return (X_data, y_data)
 
+# -------------------------------------------------------------------
+
+class CharIndeces_Vectorizer(BaseVectorizer):
+    """
+    Символы меняются на индексы. Далее цепочка символов в каждом
+    слове дополняется справа до фиксированной длины, и получившиеся
+    цепочки склеиваются в возвращаемый вектор индексов символов.
+    Предполагается, что далее будет использован Embedding слой для
+    получения встраивания каждого символа в векторное пространство.
+    """
+    def __init__(self):
+        super(CharIndeces_Vectorizer,self).__init__()
+
+    @classmethod
+    def get_name(self):
+        return 'char_indeces'
+
+    def vectorize_dataset(self):
+        (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words=None)
+
+        assert( len(dataset_x)==NB_SAMPLES )
+
+        self.all_chars = set()
+        for w in all_words:
+            self.all_chars.update(w)
+
+        nb_chars = len(self.all_chars)
+        self.char2index = dict( [ (c,i) for i,c in enumerate( itertools.chain(u' ', self.all_chars) )] )
+
+        max_word_len = max( [len(w) for w in all_words] )
+        vec_len = max_word_len
+
+        # -------------------------------------------------------------------
+
+        y_data = np.zeros((NB_SAMPLES), dtype='bool')
+        y_data[:] = dataset_y[:]
+
+        input_size = vec_len * NGRAM_ORDER
+        X_data = np.zeros((NB_SAMPLES, input_size), dtype='int32')
+
+        for idata, ngram in enumerate(dataset_x):
+            for iword, word in enumerate(ngram):
+                for j,c in enumerate(word[::-1]):
+                    X_data[idata, iword * vec_len + j] = self.char2index[c]
+
+        return (X_data, y_data)
+
+    @property
+    def nb_chars(self):
+        return len(self.char2index)
 
