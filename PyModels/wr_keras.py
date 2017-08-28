@@ -27,15 +27,25 @@ from DatasetSplitter import split_dataset
 
 
 
-REPRESENTATIONS = 'char_indeces' # 'word_indeces' | 'w2v' | 'w2v_tags' | 'char_indeces'
-NET_ARCH = 'MLP' # 'MLP' | 'ConvNet'
+# арность N-грамм
+NGRAM_ORDER = 2
+
+# кол-во сэмплов в датасете
+NB_SAMPLES = 6000000
+
+# Выбранный вариант представления слов - см. модуль DatasetVectorizers.py
+REPRESENTATIONS = 'word_indeces' # 'word_indeces' | 'w2v' | 'w2v_tags' | 'char_indeces'
+
+# Архитектура нейросети
+NET_ARCH = 'CNN' # 'MLP' | 'CNN'
+
 
 # -----------------------------------------------------------------------
 
 def build_model( dataset_generator, X_data ):
     ngram_arity = dataset_generator.get_ngram_arity()
 
-    use_conv = NET_ARCH == 'ConvNet'
+    use_conv = NET_ARCH == 'CNN'
     net = None
 
     if REPRESENTATIONS == 'word_indeces':
@@ -167,7 +177,10 @@ def build_model( dataset_generator, X_data ):
                 net3 = GlobalMaxPooling1D()(net3)
                 nets.append(net3)
 
-            net = concatenate(nets)
+            if len(nets)>1:
+                net = concatenate(nets)
+            else:
+                net = nets[0]
 
             net = Dense(units=int(input_seq_len / 2), activation='relu')(net)
             net = BatchNormalization()(net)
@@ -272,7 +285,7 @@ def build_model( dataset_generator, X_data ):
 # Загружаем датасет
 # TODO: в будущем надо перейти к работе через итераторы для минибатчей
 dataset_generator = BaseVectorizer.get_dataset_generator(REPRESENTATIONS)
-X_data,y_data = dataset_generator.vectorize_dataset()
+X_data,y_data = dataset_generator.vectorize_dataset(NGRAM_ORDER, NB_SAMPLES)
 gc.collect()
 X_train,  y_train, X_val, y_val, X_holdout, y_holdout = split_dataset(X_data, y_data )
 ngram_arity = dataset_generator.get_ngram_arity()

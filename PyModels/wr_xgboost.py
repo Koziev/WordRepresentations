@@ -14,6 +14,14 @@ import sklearn.model_selection
 from DatasetVectorizers import BaseVectorizer
 from DatasetSplitter import split_dataset
 
+
+# арность N-грамм
+NGRAM_ORDER = 2
+
+# кол-во сэмплов в датасете
+NB_SAMPLES = 1000000
+
+
 # проверямеый вариант представления слов в датасете
 # w2v - используем word2vec
 # w2v_tags - склеиваются w2v векторы слов и дополнительно приклеиваются морфологические признаки каждого слова
@@ -21,7 +29,8 @@ from DatasetSplitter import split_dataset
 # bc - в качестве репрезентаций используются векторы, созданные в результате работы brown clustering
 # chars - каждое слово кодируется как цепочка из 1-hot репрезентаций символов
 # hashing_trick - используется hashing trick для кодирования слов ограниченным числом битов индекса
-REPRESENTATIONS = 'w2v_tags' # 'w2v' | 'w2v_tags' | 'random_bitvector' | 'bc' | 'chars' | 'hashing_trick' ...
+# word_freq - единственным признаком слова является его частота в корпусе
+REPRESENTATIONS = 'word_freq' # 'w2v' | 'w2v_tags' | 'random_bitvector' | 'bc' | 'chars' | 'hashing_trick' ...
 
 
 dataset_generator = BaseVectorizer.get_dataset_generator(REPRESENTATIONS)
