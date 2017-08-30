@@ -175,6 +175,9 @@ http://kelijah.livejournal.com/217608.html
 
 ## Текущие результаты
 
+Основная таблица результатов доступна по [ссылке](https://github.com/Koziev/WordRepresentations/blob/master/results/results.txt).
+Остальные перечисленные далее результаты получены для набора из 1,000,000 3-грамм.
+
 ### XGBoost
 
 Для решателя на базе XGBoost (wr_xgboost.py) получены следующие результаты.
@@ -187,64 +190,6 @@ bc (brown clustering) ==> 0.70
 chars (char one-hot encoding) ==> 0.71  
 random_bitvector (random bit vectors, доля единиц 16%) ==> 0.696  
 hashing_trick (hashing trick with 32,000 slots) ==> 0.64  
-
-
-### Keras MLP|CNN
-
-Нижеприведенные результаты получены с помощью нейросетевой модели на базе Keras (wr_keras.py).
-
-
-NB_SAMPLES=1,000,000  NGRAM_ORDER=2  w2v_tags  acc=0.8340  
-NB_SAMPLES=2,000,000  NGRAM_ORDER=2  w2v_tags  acc=0.8405  
-NB_SAMPLES=3,000,000  NGRAM_ORDER=2  w2v_tags  acc=0.8474  
-NB_SAMPLES=5,000,000  NGRAM_ORDER=2  w2v_tags  acc=0.8511  
-NB_SAMPLES=10,000,000 NGRAM_ORDER=2  w2v_tags  acc=0.8561  
-
-NB_SAMPLES=1,000,000  NGRAM_ORDER=2  word_indeces  acc=0.7452  
-NB_SAMPLES=2,000,000  NGRAM_ORDER=2  word_indeces  acc=0.7619  
-NB_SAMPLES=3,000,000  NGRAM_ORDER=2  word_indeces  acc=0.7735  
-NB_SAMPLES=5,000,000  NGRAM_ORDER=2  word_indeces  acc=0.7835  
-NB_SAMPLES=6,000,000  NGRAM_ORDER=2  word_indeces  acc=0.7849  
-NB_SAMPLES=10,000,000 NGRAM_ORDER=2  word_indeces  acc=0.8103  
-
-NB_SAMPLES=1,000,000  NGRAM_ORDER=2  w2v  acc=0.7954  
-NB_SAMPLES=2,000,000  NGRAM_ORDER=2  w2v  acc=0.8010  
-NB_SAMPLES=3,000,000  NGRAM_ORDER=2  w2v  acc=0.8050  
-NB_SAMPLES=5,000,000  NGRAM_ORDER=2  w2v  acc=0.8065  
-NB_SAMPLES=6,000,000  NGRAM_ORDER=2  w2v  acc=0.8086  
-NB_SAMPLES=10,000,000 NGRAM_ORDER=2  w2v  acc=0.8132  
-
-
-NB_SAMPLES=1,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8528  
-NB_SAMPLES=2,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8585  
-NB_SAMPLES=3,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8662  
-NB_SAMPLES=5,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8738  
-NB_SAMPLES=6,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8760  
-NB_SAMPLES=8,000,000  NGRAM_ORDER=3  w2v_tags  acc=0.8774  
-
-                      
-NB_SAMPLES=1,000,000  NGRAM_ORDER=3  word_indeces  acc=0.7719  
-NB_SAMPLES=2,000,000  NGRAM_ORDER=3  word_indeces  acc=0.7807  
-NB_SAMPLES=3,000,000  NGRAM_ORDER=3  word_indeces  acc=0.7875  
-NB_SAMPLES=5,000,000  NGRAM_ORDER=3  word_indeces  acc=0.8250  
-NB_SAMPLES=6,000,000  NGRAM_ORDER=3  word_indeces  acc=0.8266  
-NB_SAMPLES=8,000,000  NGRAM_ORDER=3  word_indeces  acc=0.8328  
-
-NB_SAMPLES=1,000,000  NGRAM_ORDER=3  w2v  acc=0.8116  
-NB_SAMPLES=2,000,000  NGRAM_ORDER=3  w2v  acc=0.8140  
-NB_SAMPLES=3,000,000  NGRAM_ORDER=3  w2v  acc=0.8191  
-NB_SAMPLES=5,000,000  NGRAM_ORDER=3  w2v  acc=0.8280  
-NB_SAMPLES=6,000,000  NGRAM_ORDER=3  w2v  acc=0.8275  
-NB_SAMPLES=8,000,000  NGRAM_ORDER=3  w2v  acc=0.8289  
-
-NB_SAMPLES=1,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8376  
-NB_SAMPLES=2,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8575  
-NB_SAMPLES=3,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8701  
-NB_SAMPLES=5,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8789  
-NB_SAMPLES=6,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8751  
-NB_SAMPLES=8,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8805  
-
-
 
 Для решателя на базе Lasagne MLP:
 
