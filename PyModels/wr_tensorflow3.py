@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
-Головной решатель на базе нейросетки, созданной средствами TensorFlow,
-для бенчмарка эффективности разных word representation в задаче
-определения допустимости N-граммы (https://github.com/Koziev/WordRepresentations).
+Решение задачи https://github.com/Koziev/WordRepresentations с помощью нейросетки,
+созданной средствами TensorFlow high-level api.
 
 (c) Козиев Илья inkoziev@gmail.com
 '''
@@ -23,7 +22,7 @@ NGRAM_ORDER = 3
 NB_SAMPLES = 1000000
 
 # Выбранный вариант представления слов - см. модуль DatasetVectorizers.py
-REPRESENTATIONS = 'w2v_tags' # 'word_indeces' | 'w2v' | 'w2v_tags' | 'char_indeces'
+REPRESENTATIONS = 'w2v_tags' #  'w2v' | 'w2v_tags' | 'chars'
 
 BATCH_SIZE = 256
 
@@ -46,11 +45,8 @@ def mlp_model_fn( features, labels, mode):
 
     predictions = {
       # Generate predictions (for PREDICT and EVAL mode)
-      #"classes": tf.argmax(input=logits, axis=1),
       "classes": tf.round( logits ),
-      # Add `softmax_tensor` to the graph. It is used for PREDICT and by the
-      # `logging_hook`.
-      #"probabilities": tf.nn.softmax(logits, name="softmax_tensor")
+      # Add `softmax_tensor` to the graph. It is used for PREDICT and by the `logging_hook`.
       "probabilities": logits
     }
 
@@ -82,9 +78,10 @@ def mlp_model_fn( features, labels, mode):
 # ------------------------------------------------------------------------
 
 def empty_folder(folder):
-    files = glob.glob(folder+'/*')
-    for f in files:
-        if os.path.isdir(f) and f!=folder:
+    files = os.listdir(folder)
+    #files = glob.glob(folder+'/*')
+    for f in [ os.path.join(folder,f) for f in files]:
+        if os.path.isdir(f):
             empty_folder(f)
         elif os.path.isfile(f):
             os.remove(f)
@@ -92,6 +89,7 @@ def empty_folder(folder):
 
 # ----------------------------------------------------------------------
 
+empty_folder(MODEL_DIR)
 
 dataset_generator = BaseVectorizer.get_dataset_generator(REPRESENTATIONS)
 X_data,y_data = dataset_generator.vectorize_dataset(NGRAM_ORDER, NB_SAMPLES)
@@ -114,7 +112,6 @@ print('X_train.shape={} X_val.shape={} X_holdout.shape={}'.format(X_train.shape,
 
 input_size = X_train.shape[1]
 
-empty_folder(MODEL_DIR)
 
 # Specify that all features have real-value data
 feature_columns = [tf.feature_column.numeric_column("x", shape=[input_size])]
