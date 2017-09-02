@@ -3,7 +3,7 @@
 ## Решаемая задача
 
 Этот экспериментальный бенчмарк сравнивает разные способы представления слов
-в упрощенной задаче построения так называемой language model (https://en.wikipedia.org/wiki/Language_model).
+в упрощенной задаче построения так называемой [language model](https://en.wikipedia.org/wiki/Language_model).
 
 Language Model - это способ вычислить вероятность заданного фрагмента текста (цепочки слов).
 В NLP ранее широко использовались различные варианты построения LM на базе подсчета
@@ -83,20 +83,30 @@ Keras или аналогичного) символы преобразуются
 
 ## Модули и решатели
 
+Для решения задачи использовались различные библиотеки машинного обучения, нейросетевые
+фреймворки и библиотеки для матричных вычислений, в том числе:
+
+[Keras](https://keras.io/) (с Theano backend)  
+[Lasagne](https://github.com/Lasagne/Lasagne) (Theano)  
+[nolearn](https://github.com/dnouri/nolearn) (Theano)  
+[TensorFlow](https://www.tensorflow.org/)  
+
+
 **Запускаемые программы на Python:**  
-[PyModels/wr_xgboost.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_xgboost.py) - решатель на базе XGBoost  
-[PyModels/wr_catboost.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_catboost.py) - решатель на базе CatBoost по индексам слов, использующий возможность указать индексы категориальных признаков в датасете, чтобы бустер самостоятельно учел их при тренировке  
-[PyModels/wr_keras.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_keras.py) - решатель на базе feed forward нейросетки, реализованной на Keras  
-[PyModels/wr_lasagne.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_lasagne.py) - решатель на базе feed forward нейросетки, реализованной на Lasagne (Theano)  
-[PyModels/wr_nolearn.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_nolearn.py) - решатель на базе feed forward нейросетки, реализованной на nolearn+Lasagne (Theano)  
+[PyModels/wr_xgboost.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_xgboost.py) - решатель на базе [XGBoost](http://xgboost.readthedocs.io/en/latest/python/python_api.html)  
+[PyModels/wr_catboost.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_catboost.py) - решатель на базе [CatBoost](https://github.com/catboost/catboost) по индексам слов, использующий возможность указать индексы категориальных признаков в датасете, чтобы бустер самостоятельно учел их при тренировке  
+[PyModels/wr_keras.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_keras.py) - решатель на базе feed forward нейросетки, реализованной на [Keras](https://keras.io/)  
+[PyModels/wr_lasagne.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_lasagne.py) - решатель на базе feed forward нейросетки, реализованной на [Lasagne](https://github.com/Lasagne/Lasagne) (Theano)  
+[PyModels/wr_nolearn.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_nolearn.py) - решатель на базе feed forward нейросетки, реализованной на [nolearn](https://github.com/dnouri/nolearn)+Lasagne (Theano)  
+[PyModels/wr_tensorflow.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_tensorflow.py) - решатель на базе feed forward нейросетки, реализованной на [TensorFlow](https://www.tensorflow.org/)  
 
 **Компилируемые программы на C#:**  
-[CSharpModels/WithAccordNet/Program.cs](https://github.com/Koziev/WordRepresentations/blob/master/CSharpModels/WithAccordNet/Program.cs) - решатель на базе feed forward сетки Accord.NET (C#, проект для VS 2015)  
+[CSharpModels/WithAccordNet/Program.cs](https://github.com/Koziev/WordRepresentations/blob/master/CSharpModels/WithAccordNet/Program.cs) - решатель на базе feed forward сетки [Accord.NET](http://accord-framework.net/) (C#, проект для VS 2015)  
 
 **Компилируемые программы на C++:**  
-[CXXModels/TinyDNN_Model/TinyDNN_Model.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/TinyDNN_Model/TinyDNN_Model.cpp) - решатель на базе MLP, реализованного средствами библиотеки tiny-dnn (C++, проект для VS 2015)  
-[CXXModels/Singa_Model/alexnet.cc](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/Singa_Model/alexnet.cc) - решатель на базе нейросетки, реализованной средствами Apache.SINGA (C++, проект для VS 2015)  
-[CXXModels/OpenNN_Model/main.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/OpenNN_Model/main.cpp) - решатель на базе нейросетки, реализованной средствами OpenNN (C++, проект для VS 2015)  
+[CXXModels/TinyDNN_Model/TinyDNN_Model.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/TinyDNN_Model/TinyDNN_Model.cpp) - решатель на базе MLP, реализованного средствами библиотеки [tiny-dnn](https://github.com/tiny-dnn) (C++, проект для VS 2015)  
+[CXXModels/Singa_Model/alexnet.cc](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/Singa_Model/alexnet.cc) - решатель на базе нейросетки, реализованной средствами [Apache.SINGA](https://singa.incubator.apache.org/en/index.html) (C++, проект для VS 2015)  
+[CXXModels/OpenNN_Model/main.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/OpenNN_Model/main.cpp) - решатель на базе нейросетки, реализованной средствами [OpenNN](http://www.opennn.net/) (C++, проект для VS 2015)  
 
 **Внутренние классы и инструменты:**  
 PyModels/DatasetVectorizers.py - векторизаторы датасета и фабрика для удобного выбора векторизатора по его условному названию  
