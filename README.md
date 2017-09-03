@@ -102,6 +102,7 @@ Keras или аналогичного) символы преобразуются
 
 **Компилируемые программы на C#:**  
 [CSharpModels/WithAccordNet/Program.cs](https://github.com/Koziev/WordRepresentations/blob/master/CSharpModels/WithAccordNet/Program.cs) - решатель на базе feed forward сетки [Accord.NET](http://accord-framework.net/) (C#, проект для VS 2015)  
+[CSharpModels/MyBaseline/Program.cs](https://github.com/Koziev/WordRepresentations/blob/master/CSharpModels/WithAccordNet/Program.cs) - решение на базе моей реализации vanilla MLP (C#, проект для VS 2015)  
 
 **Компилируемые программы на C++:**  
 [CXXModels/TinyDNN_Model/TinyDNN_Model.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/TinyDNN_Model/TinyDNN_Model.cpp) - решатель на базе MLP, реализованного средствами библиотеки [tiny-dnn](https://github.com/tiny-dnn) (C++, проект для VS 2015)  
