@@ -92,7 +92,7 @@ Keras или аналогичного) символы преобразуются
 [TensorFlow](https://www.tensorflow.org/)  
 
 
-**Запускаемые программы на Python:**  
+**Решения на Python:**  
 [PyModels/wr_xgboost.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_xgboost.py) - решатель на базе [XGBoost](http://xgboost.readthedocs.io/en/latest/python/python_api.html)  
 [PyModels/wr_catboost.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_catboost.py) - решатель на базе [CatBoost](https://github.com/catboost/catboost) по индексам слов, использующий возможность указать индексы категориальных признаков в датасете, чтобы бустер самостоятельно учел их при тренировке  
 [PyModels/wr_keras.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_keras.py) - решатель на базе feed forward нейросетки, реализованной на [Keras](https://keras.io/)  
@@ -100,14 +100,17 @@ Keras или аналогичного) символы преобразуются
 [PyModels/wr_nolearn.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_nolearn.py) - решатель на базе feed forward нейросетки, реализованной на [nolearn](https://github.com/dnouri/nolearn)+Lasagne (Theano)  
 [PyModels/wr_tensorflow.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/wr_tensorflow.py) - решатель на базе feed forward нейросетки, реализованной на [TensorFlow](https://www.tensorflow.org/)  
 
-**Компилируемые программы на C#:**  
+**Решения на C#:**  
 [CSharpModels/WithAccordNet/Program.cs](https://github.com/Koziev/WordRepresentations/blob/master/CSharpModels/WithAccordNet/Program.cs) - решатель на базе feed forward сетки [Accord.NET](http://accord-framework.net/) (C#, проект для VS 2015)  
-[CSharpModels/MyBaseline/Program.cs](https://github.com/Koziev/WordRepresentations/blob/master/CSharpModels/WithAccordNet/Program.cs) - решение на базе моей реализации vanilla MLP (C#, проект для VS 2015)  
+[CSharpModels/MyBaseline/Program.cs](https://github.com/Koziev/WordRepresentations/blob/master/CSharpModels/MyBaseline/Program.cs) - решение на базе моей реализации vanilla MLP (C#, проект для VS 2015)  
 
-**Компилируемые программы на C++:**  
+**Решения на C++:**  
 [CXXModels/TinyDNN_Model/TinyDNN_Model.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/TinyDNN_Model/TinyDNN_Model.cpp) - решатель на базе MLP, реализованного средствами библиотеки [tiny-dnn](https://github.com/tiny-dnn) (C++, проект для VS 2015)  
 [CXXModels/Singa_Model/alexnet.cc](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/Singa_Model/alexnet.cc) - решатель на базе нейросетки, реализованной средствами [Apache.SINGA](https://singa.incubator.apache.org/en/index.html) (C++, проект для VS 2015)  
 [CXXModels/OpenNN_Model/main.cpp](https://github.com/Koziev/WordRepresentations/blob/master/CXXModels/OpenNN_Model/main.cpp) - решатель на базе нейросетки, реализованной средствами [OpenNN](http://www.opennn.net/) (C++, проект для VS 2015)  
+
+**Решения на Java**
+[JavaModels/WithDL4J/src/main/java/WordRepresentationsTest.java](https://github.com/Koziev/WordRepresentations/blob/master/JavaModels/WithDL4J/src/main/java/WordRepresentationsTest.java) - решатель на базе MLP, реализованного средствами библиотеки [deeplearning4j](https://deeplearning4j.org/)  
 
 **Внутренние классы и инструменты:**  
 PyModels/DatasetVectorizers.py - векторизаторы датасета и фабрика для удобного выбора векторизатора по его условному названию  
