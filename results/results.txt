@@ -19,33 +19,56 @@ NB_SAMPLES=2,000,000  NGRAM_ORDER=4  w2v_tags  acc=0.8091
 
 
 
-wr_keras.py
-===========
+wr_keras.py (Keras+Theano, Python)
+==================================
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=2  net=MLP  w2v      acc=0.7719
+NB_SAMPLES=1,000,000  NGRAM_ORDER=2  net=CNN  w2v      acc=0.7741
 
 NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=MLP  w2v      acc=0.7709
+NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=CNN  w2v      acc=0.7837
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=4  net=MLP  w2v      acc=0.7468
+NB_SAMPLES=1,000,000  NGRAM_ORDER=4  net=CNN  w2v      acc=0.7731
+
 
 
 NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=MLP  w2v_tags acc=0.7921
+NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=CNN  w2v_tags acc=0.7999
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=4  net=MLP  w2v_tags acc=0.7653
+NB_SAMPLES=1,000,000  NGRAM_ORDER=4  net=CNN  w2v_tags acc=0.7775
 
 
-wr_keras_sdr2.py
-================
+
+wr_keras_sdr2.py (Keras+Theano, Python)
+=======================================
 
 NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=MLP  SDR2     acc=0.7596
 
 
 
 
-wr_tensorflow3.py
-=================
+wr_tensorflow3.py (Tensorflow, Python)
+======================================
 
 NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=MLP  w2v      acc=0.7475
 
 
-NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=MLP  w2v_tags acc=
+NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=MLP  w2v_tags acc=0.7866
 
 
 
+deeplearning4j (Java)
+=====================
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=MLP  w2v      acc=0.7715
+
+
+Apache.SINGA (C++)
+==================
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=MLP  w2v      acc=0.7692
 
 
 
