@@ -28,16 +28,16 @@ from DatasetSplitter import split_dataset
 
 
 # арность N-грамм
-NGRAM_ORDER = 2
+NGRAM_ORDER = 3
 
 # кол-во сэмплов в датасете
-NB_SAMPLES = 6000000
+NB_SAMPLES = 2000000
 
 # Выбранный вариант представления слов - см. модуль DatasetVectorizers.py
-REPRESENTATIONS = 'word_indeces' # 'word_indeces' | 'w2v' | 'w2v_tags' | 'char_indeces'
+REPRESENTATIONS = 'sdr' # 'word_indeces' | 'w2v' | 'w2v_tags' | 'char_indeces'
 
 # Архитектура нейросети
-NET_ARCH = 'CNN' # 'MLP' | 'CNN'
+NET_ARCH = 'MLP' # 'MLP' | 'CNN'
 
 
 # -----------------------------------------------------------------------
@@ -303,10 +303,10 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=5, verbose=1, mode='
 
 # Обучаем на датасете
 print('Train...')
-history = model.fit(X_data, y_data,
+history = model.fit(X_train, y_train,
                     batch_size=512,
                     epochs=200,
-                    validation_split=0.1,
+                    validation_data=(X_val, y_val),
                     callbacks=[model_checkpoint, early_stopping])
 
 model.load_weights(weights_filename)
