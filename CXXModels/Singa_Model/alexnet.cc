@@ -1,23 +1,4 @@
-/************************************************************
-*
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*
-*************************************************************/
+#include <math.h>
 
 #include "singa/model/feed_forward_net.h"
 #include "singa/model/optimizer.h"
@@ -26,9 +7,6 @@
 #include "singa/utils/string.h"
 
 #include "singa/core/initialize_static_ctors.h" // added by inkoziev
-
-
-
 
 
 using namespace singa;
@@ -130,8 +108,10 @@ static void split(const string &s, const char* delim, vector<string> & v)
 	return;
 }
 
-static Tensor load_tensor_from_csv(const std::wstring & data_folder, const wchar_t * filename, singa::DataType data_type)
+static Tensor load_tensor_from_csv(const std::string & data_folder, const char * filename, singa::DataType data_type)
 {
+	LOG(INFO) << "Loading dataset from " << filename;
+
 	size_t nb_row = 0;
 	size_t nb_col = 0;
 
@@ -213,7 +193,7 @@ static FeedForwardNet create_net(size_t input_size)
 	FeedForwardNet net;
 	Shape s{ input_size };
 
-	net.Add(GenHiddenDenseConf("dense1", 96, 1.0, 1.0), &s);
+	net.Add(GenHiddenDenseConf("dense1", input_size, 1.0, 1.0), &s);
 	net.Add(GenSigmoidConf("dense1_a"));
 	net.Add(GenOutputDenseConf("dense_output", 2, 1.0, 1.0));
 	net.Add(GenSigmoidConf("dense2_a"));
@@ -228,10 +208,12 @@ static FeedForwardNet create_net_relu(size_t input_size)
 	FeedForwardNet net;
 	Shape s{ input_size };
 
-	net.Add(GenHiddenDenseConf("dense1", 96, 1.0, 1.0), &s);
+	net.Add(GenHiddenDenseConf("relu1", input_size, 1.0, 1.0), &s);
 	net.Add(GenReLUConf("relu1_a"));
-	net.Add(GenHiddenDenseConf("dense2", 96, 1.0, 1.0), &s);
+	net.Add(GenHiddenDenseConf("relu2", input_size/2, 1.0, 1.0));
 	net.Add(GenReLUConf("relu2_a"));
+	net.Add(GenHiddenDenseConf("relu3", input_size/3, 1.0, 1.0));
+	net.Add(GenReLUConf("relu3_a"));
 	net.Add(GenOutputDenseConf("dense_output", 2, 1.0, 1.0));
 	net.Add(GenSigmoidConf("dense2_a"));
 
@@ -239,13 +221,13 @@ static FeedForwardNet create_net_relu(size_t input_size)
 }
 
 
-static void Train(int num_epoch, const std::wstring & data_dir)
+static void Train(int num_epoch, const std::string & data_dir)
 {
-	Tensor train_x = load_tensor_from_csv(data_dir, L"X_train.csv", kFloat32);
-	Tensor train_y = load_tensor_from_csv(data_dir, L"y_train.csv", kInt);
+	Tensor train_x = load_tensor_from_csv(data_dir, "X_train.csv", kFloat32);
+	Tensor train_y = load_tensor_from_csv(data_dir, "y_train.csv", kInt);
 
-	Tensor val_x = load_tensor_from_csv(data_dir, L"X_val.csv", kFloat32);
-	Tensor val_y = load_tensor_from_csv(data_dir, L"y_val.csv", kInt);
+	Tensor val_x = load_tensor_from_csv(data_dir, "X_val.csv", kFloat32);
+	Tensor val_y = load_tensor_from_csv(data_dir, "y_val.csv", kInt);
 
 	size_t nsamples = train_x.shape(0);
 
@@ -256,6 +238,9 @@ static void Train(int num_epoch, const std::wstring & data_dir)
 		<< ", Test samples = " << val_y.shape(0);
 
 	auto net = create_net(train_x.shape(1));
+	//auto net = create_net_relu(train_x.shape(1));
+
+	
 	SGD sgd;
 	OptimizerConf opt_conf;
 	opt_conf.set_momentum(0.9);
@@ -263,8 +248,20 @@ static void Train(int num_epoch, const std::wstring & data_dir)
 	reg->set_coefficient(0.0000);
 	sgd.Setup(opt_conf);
 	sgd.SetLearningRateGenerator([](int step) {
+		return 0.5 * exp(-step/10.0);
+	});
+
+/*
+	AdaGrad sgd;
+	OptimizerConf opt_conf;
+	opt_conf.set_momentum(0.9);
+	//auto reg = opt_conf.mutable_regularizer();
+	//reg->set_coefficient(0.0000);
+	sgd.Setup(opt_conf);
+	sgd.SetLearningRateGenerator([](int step) {
 		return 0.1;
 	});
+*/
 
 	SoftmaxCrossEntropy loss;
 	//MSE loss;
@@ -279,13 +276,15 @@ static void Train(int num_epoch, const std::wstring & data_dir)
 	test_y.ToDevice(dev);
 #endif  // USE_CUDNN
 
+	LOG(INFO) << "Start training";
 	size_t batch_size = 128;
 	net.Train(batch_size, num_epoch, train_x, train_y, val_x, val_y);
+	LOG(INFO) << "End training";
 
 	LOG(INFO) << "Start evaluating";
 
-	Tensor holdout_x = load_tensor_from_csv(data_dir, L"X_holdout.csv", kFloat32);
-	Tensor holdout_y = load_tensor_from_csv(data_dir, L"y_holdout.csv", kInt);
+	Tensor holdout_x = load_tensor_from_csv(data_dir, "X_holdout.csv", kFloat32);
+	Tensor holdout_y = load_tensor_from_csv(data_dir, "y_holdout.csv", kInt);
 
 	std::pair<Tensor, Tensor> holdout_res = net.Evaluate(holdout_x, holdout_y, 256);
 
@@ -311,13 +310,13 @@ int main(int argc, char **argv)
 	if (pos != -1) nEpoch = atoi(argv[pos + 1]);
 	pos = singa::ArgPos(argc, argv, "-data");
 
-	int nb_epochs = 100;
+	int nb_epochs = 50;
 
-	std::wstring data_folder(L"e:/polygon/WordRepresentations/data/");
+	std::string data_folder("e:/polygon/WordRepresentations/data/");
 
-	LOG(INFO) << "Start training";
 	Train(nb_epochs, data_folder);
-	LOG(INFO) << "End training";
+
+	LOG(INFO) << "Alldone.";
 
 	return 0;
 }
