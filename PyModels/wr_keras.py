@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
-Головной решатель на базе нейросетки keras для бенчмарка эффективности разных word representation
-в задаче определения допустимости N-граммы.
+Решение задачи https://github.com/Koziev/WordRepresentations с помощью нейросетки на Keras.
+
+Проверяются разные варианты представления слов - см. глобальную переменную REPRESENTATIONS
 
 Реализованы следующие архитектуры нейросети:
 MLP - простая feedforward сетка
@@ -13,7 +14,6 @@ ConvNet - сверточные слои
 from __future__ import print_function
 import gc
 import sklearn
-#import sklearn.model_selection
 from keras.layers import Dense, Dropout, Input, Flatten
 from keras.layers.core import Reshape
 from keras.layers.merge import concatenate
@@ -31,10 +31,10 @@ from DatasetSplitter import split_dataset
 NGRAM_ORDER = 3
 
 # кол-во сэмплов в датасете
-NB_SAMPLES = 2000000
+NB_SAMPLES = 1000000
 
 # Выбранный вариант представления слов - см. модуль DatasetVectorizers.py
-REPRESENTATIONS = 'sdr' # 'word_indeces' | 'w2v' | 'w2v_tags' | 'char_indeces'
+REPRESENTATIONS = 'w2v_tags' # 'word_indeces' | 'w2v' | 'w2v_tags' | 'char_indeces'
 
 # Архитектура нейросети
 NET_ARCH = 'MLP' # 'MLP' | 'CNN'

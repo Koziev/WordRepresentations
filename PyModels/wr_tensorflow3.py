@@ -3,6 +3,8 @@
 Решение задачи https://github.com/Koziev/WordRepresentations с помощью нейросетки,
 созданной средствами TensorFlow high-level api.
 
+Проверяются разные варианты представления слов - см. глобальную переменную REPRESENTATIONS
+
 (c) Козиев Илья inkoziev@gmail.com
 '''
 
@@ -22,7 +24,7 @@ NGRAM_ORDER = 3
 NB_SAMPLES = 1000000
 
 # Выбранный вариант представления слов - см. модуль DatasetVectorizers.py
-REPRESENTATIONS = 'w2v_tags' #  'w2v' | 'w2v_tags' | 'chars'
+REPRESENTATIONS = 'w2v' #  'w2v' | 'w2v_tags' | 'chars'
 
 BATCH_SIZE = 256
 
