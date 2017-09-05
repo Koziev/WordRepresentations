@@ -246,6 +246,7 @@ class SDR_Vectorizer(BaseVectorizer):
         # путь к подготовленным SDR слов
         # TODO: вынести в конфигурацию
         sdr_path = r'/home/eek/polygon/w2v_binarizarion/mfaruqui/sparse-coding/out_vecs.txt'
+        #sdr_path = r'/home/eek/polygon/WordSDR2/sdr.dat'
         print('Loading SDRs...')
 
         word2sdr = dict()
@@ -255,6 +256,7 @@ class SDR_Vectorizer(BaseVectorizer):
                 word = tx[0]
                 vec = [ (True if float(z)>0.0 else False) for z in tx[1:] ]
                 vec = np.asarray(vec, dtype='float32')
+                #vec = np.asarray(vec, dtype=np.bool)
                 word2sdr[word] = vec
 
         return (set(word2sdr.keys()), word2sdr)
@@ -504,7 +506,7 @@ class WordIndeces_Vectorizer(BaseVectorizer):
         (self.all_words, dataset_x, dataset_y) = self._load_ngrams(None, ngram_order, nb_samples)
         assert( len(dataset_x)==nb_samples )
 
-        word2id = dict([(w,i) for i,w in enumerate(self.all_words)])
+        self.word2id = dict([(w,i) for i,w in enumerate(self.all_words)])
 
         # -------------------------------------------------------------------
 
@@ -516,9 +518,12 @@ class WordIndeces_Vectorizer(BaseVectorizer):
 
         for idata, ngram in enumerate(dataset_x):
             for iword, word in enumerate(ngram):
-                X_data[idata, iword ] = word2id[word]
+                X_data[idata, iword ] = self.word2id[word]
 
         return (X_data, y_data)
+
+    def get_vocabulary(self):
+        return self.word2id
 
 # -------------------------------------------------------------------
 
