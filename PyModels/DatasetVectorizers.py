@@ -200,7 +200,14 @@ class W2V_Vectorizer(BaseVectorizer):
         w2v = gensim.models.KeyedVectors.load_word2vec_format(w2v_path, binary=False)
         return w2v
 
-    def vectorize_dataset(self, ngram_order=3, nb_samples=1000000):
+    def vectorize_dataset(self, ngram_order=None, nb_samples=None):
+
+        if not ngram_order:
+            ngram_order = 3
+
+        if not nb_samples:
+            nb_samples = 1000000
+
         w2v = self._load_w2v()
 
         valid_words = set(w2v.vocab)
@@ -261,7 +268,14 @@ class SDR_Vectorizer(BaseVectorizer):
 
         return (set(word2sdr.keys()), word2sdr)
 
-    def vectorize_dataset(self, ngram_order=3, nb_samples=1000000):
+    def vectorize_dataset(self, ngram_order=None, nb_samples=None):
+
+        if not ngram_order:
+            ngram_order = 3
+
+        if not nb_samples:
+            nb_samples = 1000000
+
         (valid_words,word2sdr) = self._load_sdr()
 
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words, ngram_order, nb_samples)
@@ -301,7 +315,13 @@ class BinaryWord_Vectorizer(BaseVectorizer):
     def get_name(self):
         return 'random_bitvector'
 
-    def vectorize_dataset(self, ngram_order=3, nb_samples=1000000):
+    def vectorize_dataset(self, ngram_order=None, nb_samples=None):
+
+        if not ngram_order:
+            ngram_order = 3
+
+        if not nb_samples:
+            nb_samples = 1000000
 
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words=None, ngram_order=ngram_order, nb_samples=nb_samples)
 
@@ -364,7 +384,13 @@ class BrownClusters_Vectorizer(BaseVectorizer):
 
         return w2bc
 
-    def vectorize_dataset(self, ngram_order=3, nb_samples=1000000):
+    def vectorize_dataset(self, ngram_order=None, nb_samples=None):
+
+        if not ngram_order:
+            ngram_order = 3
+
+        if not nb_samples:
+            nb_samples = 1000000
 
         w2bc = self._load_bc()
 
@@ -409,7 +435,14 @@ class Chars_Vectorizer(BaseVectorizer):
     def get_name(self):
         return 'chars'
 
-    def vectorize_dataset(self, ngram_order=3, nb_samples=1000000):
+    def vectorize_dataset(self, ngram_order=None, nb_samples=None):
+
+        if not ngram_order:
+            ngram_order = 3
+
+        if not nb_samples:
+            nb_samples = 1000000
+
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words=None, ngram_order=ngram_order, nb_samples=nb_samples)
 
         assert( len(dataset_x)==nb_samples )
@@ -456,7 +489,13 @@ class HashingTrick_Vectorizer(BaseVectorizer):
     def get_name(self):
         return 'hashing_trick'
 
-    def vectorize_dataset(self, ngram_order=3, nb_samples=1000000):
+    def vectorize_dataset(self, ngram_order=None, nb_samples=None):
+
+        if not ngram_order:
+            ngram_order = 3
+
+        if not nb_samples:
+            nb_samples = 1000000
 
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words=None, ngram_order=ngram_order, nb_samples=nb_samples)
 
@@ -501,7 +540,13 @@ class WordIndeces_Vectorizer(BaseVectorizer):
     def nb_words(self):
         return len(self.all_words)
 
-    def vectorize_dataset(self, ngram_order=3, nb_samples=1000000):
+    def vectorize_dataset(self, ngram_order=None, nb_samples=None):
+
+        if not ngram_order:
+            ngram_order = 3
+
+        if not nb_samples:
+            nb_samples = 1000000
 
         (self.all_words, dataset_x, dataset_y) = self._load_ngrams(None, ngram_order, nb_samples)
         assert( len(dataset_x)==nb_samples )
@@ -539,7 +584,13 @@ class W2V_Tags_Vectorizer(W2V_Vectorizer):
     def get_name(self):
         return 'w2v_tags'
 
-    def vectorize_dataset(self, ngram_order=3, nb_samples=1000000):
+    def vectorize_dataset(self, ngram_order=None, nb_samples=None):
+
+        if not ngram_order:
+            ngram_order = 3
+
+        if not nb_samples:
+            nb_samples = 1000000
 
         # загружаем грамматический словарь
         tag2id = dict()
@@ -632,7 +683,7 @@ class WordFreqs_Vectorizer(BaseVectorizer):
     использования индексов слов в качестве категориальных признаков.
     """
     def __init__(self):
-        super(WordIndeces_Vectorizer,self).__init__()
+        super(WordFreqs_Vectorizer,self).__init__()
         self.all_words = []
 
     @classmethod
@@ -643,7 +694,13 @@ class WordFreqs_Vectorizer(BaseVectorizer):
     def nb_words(self):
         return len(self.all_words)
 
-    def vectorize_dataset(self, ngram_order=3, nb_samples=1000000):
+    def vectorize_dataset(self, ngram_order=None, nb_samples=None):
+
+        if not ngram_order:
+            ngram_order = 3
+
+        if not nb_samples:
+            nb_samples = 1000000
 
         print('Counting word occurencies in {}...'.format(self._get_corpus_path()))
         word2freq = collections.Counter()
@@ -668,7 +725,7 @@ class WordFreqs_Vectorizer(BaseVectorizer):
 
         (self.all_words, dataset_x, dataset_y) = self._load_ngrams(None, ngram_order, nb_samples)
 
-        word2y = dict([(w,cnt/float(sum_freq)) for w,cnt in word2freq])
+        word2y = dict([(w,cnt/float(sum_freq)) for w,cnt in word2freq.iteritems()])
 
         # -------------------------------------------------------------------
 
@@ -701,7 +758,14 @@ class CharIndeces_Vectorizer(BaseVectorizer):
     def get_name(self):
         return 'char_indeces'
 
-    def vectorize_dataset(self, ngram_order=3, nb_samples=1000000):
+    def vectorize_dataset(self, ngram_order=None, nb_samples=None):
+
+        if not ngram_order:
+            ngram_order = 3
+
+        if not nb_samples:
+            nb_samples = 1000000
+
         (all_words, dataset_x, dataset_y) = self._load_ngrams(valid_words=None, ngram_order=ngram_order, nb_samples=nb_samples)
 
         assert( len(dataset_x)==nb_samples )

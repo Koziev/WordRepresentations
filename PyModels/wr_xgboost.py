@@ -16,7 +16,7 @@ from DatasetSplitter import split_dataset
 
 
 # арность N-грамм
-NGRAM_ORDER = 2
+NGRAM_ORDER = 3
 
 # кол-во сэмплов в датасете
 NB_SAMPLES = 1000000
@@ -30,7 +30,7 @@ NB_SAMPLES = 1000000
 # chars - каждое слово кодируется как цепочка из 1-hot репрезентаций символов
 # hashing_trick - используется hashing trick для кодирования слов ограниченным числом битов индекса
 # word_freq - единственным признаком слова является его частота в корпусе
-REPRESENTATIONS = 'word_freq' # 'w2v' | 'w2v_tags' | 'random_bitvector' | 'bc' | 'chars' | 'hashing_trick' ...
+REPRESENTATIONS = 'chars' # 'w2v' | 'w2v_tags' | 'random_bitvector' | 'bc' | 'chars' | 'hashing_trick' ...
 
 
 dataset_generator = BaseVectorizer.get_dataset_generator(REPRESENTATIONS)
