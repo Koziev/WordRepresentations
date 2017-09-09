@@ -114,6 +114,7 @@ Keras или аналогичного) символы преобразуются
 [JavaModels/WithDL4J/src/main/java/WordRepresentationsTest.java](https://github.com/Koziev/WordRepresentations/blob/master/JavaModels/WithDL4J/src/main/java/WordRepresentationsTest.java) - решатель на базе MLP, реализованного средствами библиотеки [deeplearning4j](https://deeplearning4j.org/)  
 
 **Внутренние классы и инструменты:**  
+PyModels/CorpusReaders.py - классы для чтения строк из текстовых корпусов разных форматов (zipped|plain txt)
 PyModels/DatasetVectorizers.py - векторизаторы датасета и фабрика для удобного выбора векторизатора по его условному названию  
 PyModels/store_dataset_file.py - генерация датасета и его сохранение для C# и C++ моделей  
 

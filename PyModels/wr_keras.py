@@ -24,6 +24,7 @@ from keras.models import Model
 from keras.layers import Conv1D, GlobalMaxPooling1D, GlobalAveragePooling1D, MaxPooling1D, AveragePooling1D
 from DatasetVectorizers import BaseVectorizer
 from DatasetSplitter import split_dataset
+import CorpusReaders
 
 
 
@@ -34,10 +35,10 @@ NGRAM_ORDER = 3
 NB_SAMPLES = 1000000
 
 # Выбранный вариант представления слов - см. модуль DatasetVectorizers.py
-REPRESENTATIONS = 'w2v_tags' # 'word_indeces' | 'w2v' | 'w2v_tags' | 'char_indeces'
+REPRESENTATIONS = 'w2v' # 'word_indeces' | 'w2v' | 'w2v_tags' | 'char_indeces'
 
 # Архитектура нейросети
-NET_ARCH = 'MLP' # 'MLP' | 'CNN'
+NET_ARCH = 'CNN' # 'MLP' | 'CNN'
 
 
 # -----------------------------------------------------------------------
@@ -282,10 +283,12 @@ def build_model( dataset_generator, X_data ):
 
 # -----------------------------------------------------------------------
 
+corpus_reader = CorpusReaders.ZippedCorpusReader('../data/corpus.txt.zip')
+#corpus_reader = CorpusReaders.TxtCorpusReader(r'f:\Corpus\Raw\ru\tokenized_w2v.txt')
+
 # Загружаем датасет
-# TODO: в будущем надо перейти к работе через итераторы для минибатчей
 dataset_generator = BaseVectorizer.get_dataset_generator(REPRESENTATIONS)
-X_data,y_data = dataset_generator.vectorize_dataset(NGRAM_ORDER, NB_SAMPLES)
+X_data,y_data = dataset_generator.vectorize_dataset(corpus_reader=corpus_reader, ngram_order=NGRAM_ORDER, nb_samples=NB_SAMPLES)
 gc.collect()
 X_train,  y_train, X_val, y_val, X_holdout, y_holdout = split_dataset(X_data, y_data )
 ngram_arity = dataset_generator.get_ngram_arity()

@@ -15,13 +15,16 @@ from keras.layers.normalization import BatchNormalization
 from keras.models import Model
 from DatasetVectorizers import BaseVectorizer
 from DatasetSplitter import split_dataset
+import CorpusReaders
 
 
 REPRESENTATIONS = 'word_indeces'
 
+corpus_reader = CorpusReaders.ZippedCorpusReader('../data/corpus.txt.zip')
+#corpus_reader = CorpusReaders.TxtCorpusReader(r'f:\Corpus\Raw\ru\tokenized_w2v.txt')
 
 dataset_generator = BaseVectorizer.get_dataset_generator(REPRESENTATIONS)
-X_data,y_data = dataset_generator.vectorize_dataset()
+X_data,y_data = dataset_generator.vectorize_dataset(corpus_reader=corpus_reader)
 X_train,  y_train, X_val, y_val, X_holdout, y_holdout = split_dataset(X_data, y_data )
 gc.collect()
 

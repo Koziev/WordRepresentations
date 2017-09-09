@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
-Головной решатель на базе нейросетки, созданной средствами Lasagne, для бенчмарка эффективности разных word representation
-в задаче определения допустимости N-граммы.
+Головной решатель на базе нейросетки, созданной средствами nolearn/Lasagne,
+для бенчмарка эффективности разных word representation в задаче определения
+допустимости N-граммы.
 (c) Козиев Илья inkoziev@gmail.com
 '''
 
@@ -21,9 +22,11 @@ from lasagne.layers import DenseLayer
 import lasagne
 import nolearn
 from nolearn.lasagne import NeuralNet
+import pickle
 
 from DatasetVectorizers import WordIndeces_Vectorizer
 from DatasetSplitter import split_dataset
+import CorpusReaders
 
 
 batch_size = 256
@@ -49,8 +52,12 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
 
 # ----------------------------------------------------------------------------
 
+corpus_reader = CorpusReaders.ZippedCorpusReader('../data/corpus.txt.zip')
+#corpus_reader = CorpusReaders.TxtCorpusReader(r'f:\Corpus\Raw\ru\tokenized_w2v.txt')
+
+
 dataset_generator = WordIndeces_Vectorizer()
-X_data,y_data = dataset_generator.vectorize_dataset()
+X_data,y_data = dataset_generator.vectorize_dataset(corpus_reader=corpus_reader)
 
 X_train,  y_train, X_val, y_val, X_holdout, y_holdout = split_dataset(X_data, y_data )
 
@@ -76,21 +83,50 @@ network = net
 
 # -------------------------------------------------------------
 
+WEIGHTS_FILE = 'wr_nolearn.model'
+
 # Этот простой callback даст возможность следить за прогрессом в обучении
 # в терминале.
+best_val_acc = 0.0
+no_improvement_count = 0
 def on_epoch_finished( net, history ):
-    print('Epoch #{} finished: {}'.format(len(history), history[-1]))
+    global best_val_acc, no_improvement_count
+    train_loss = history[-1]['train_loss']
+    valid_loss = history[-1]['valid_loss']
+    duration = history[-1]['dur']
+
+    # если качество улучшилось, то надо бы сохранять веса модели в файл
+    y_pred = net.predict_proba(X_val)
+    y_pred = y_pred[:, 0]
+    y_pred = (y_pred > 0.5).astype(int)
+    acc = sklearn.metrics.accuracy_score(y_val, y_pred)
+    if acc>best_val_acc:
+        best_val_acc = acc
+        no_improvement_count = 0
+        with open(WEIGHTS_FILE,'w') as f:
+            pickle.dump(net,f)
+    else:
+        no_improvement_count += 1
+        if no_improvement_count>10:
+            raise StopIteration()
+
+    print('Epoch #{} finished: eta={} train_loss={} valid_loss={} valid_acc={}'.format(len(history), duration, train_loss, valid_loss, acc ))
+
 
 net = NeuralNet( net,
                  update_learning_rate=0.01,
                  objective_loss_function=lasagne.objectives.binary_crossentropy,
-                 train_split=nolearn.lasagne.base.TrainSplit(eval_size=0.5),
+                 train_split=nolearn.lasagne.base.TrainSplit(eval_size=0.1),
                  on_epoch_finished=[ on_epoch_finished ]
                 )
 
-net.fit( np.vstack((X_train,X_val)), np.concatenate((y_train,y_val)) )
+net.fit( X_train, y_train )
 
-y_pred = net.predict_proba( X_holdout )[:,1]
+# загружаем лучший вариант весов
+with open(WEIGHTS_FILE,'r') as f:
+    net = pickle.load(f)
+
+y_pred = net.predict_proba( X_holdout )[:,0]
 y_pred  = (y_pred > 0.5).astype(int)
 acc = sklearn.metrics.accuracy_score( y_holdout, y_pred )
 

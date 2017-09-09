@@ -13,6 +13,7 @@ import xgboost
 import sklearn.model_selection
 from DatasetVectorizers import BaseVectorizer
 from DatasetSplitter import split_dataset
+import CorpusReaders
 
 
 # арность N-грамм
@@ -32,9 +33,11 @@ NB_SAMPLES = 1000000
 # word_freq - единственным признаком слова является его частота в корпусе
 REPRESENTATIONS = 'chars' # 'w2v' | 'w2v_tags' | 'random_bitvector' | 'bc' | 'chars' | 'hashing_trick' ...
 
+corpus_reader = CorpusReaders.ZippedCorpusReader('../data/corpus.txt.zip')
+#corpus_reader = CorpusReaders.TxtCorpusReader(r'f:\Corpus\Raw\ru\tokenized_w2v.txt')
 
 dataset_generator = BaseVectorizer.get_dataset_generator(REPRESENTATIONS)
-X_data,y_data = dataset_generator.vectorize_dataset()
+X_data,y_data = dataset_generator.vectorize_dataset(corpus_reader=corpus_reader)
 X_train,  y_train, X_val, y_val, X_holdout, y_holdout = split_dataset(X_data, y_data )
 print('X_train.shape={} X_val.shape={} X_holdout.shape={}'.format(X_train.shape, X_val.shape, X_holdout.shape))
 

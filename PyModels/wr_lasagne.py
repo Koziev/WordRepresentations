@@ -20,12 +20,23 @@ import lasagne
 import sklearn
 import pickle
 import colorama
+import gc
 
-
-from DatasetVectorizers import WordIndeces_Vectorizer
+from DatasetVectorizers import BaseVectorizer
 from DatasetSplitter import split_dataset
+import CorpusReaders
 
 
+# арность N-грамм
+NGRAM_ORDER = 3
+
+# кол-во сэмплов в датасете
+NB_SAMPLES = 1000000
+
+# Выбранный вариант представления слов - см. модуль DatasetVectorizers.py
+REPRESENTATIONS = 'word_indeces' # 'word_indeces' | 'w2v' | 'w2v_tags' | 'char_indeces'
+
+# прочие метапараметры модели
 batch_size = 1000
 embed_dim = 32
 num_epochs = 50
@@ -49,10 +60,19 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
 
 colorama.init()
 
-dataset_generator = WordIndeces_Vectorizer()
-X_data,y_data = dataset_generator.vectorize_dataset()
+corpus_reader = CorpusReaders.ZippedCorpusReader('../data/corpus.txt.zip')
+#corpus_reader = CorpusReaders.TxtCorpusReader(r'f:\Corpus\Raw\ru\tokenized_w2v.txt')
+
+
+dataset_generator = BaseVectorizer.get_dataset_generator(REPRESENTATIONS)
+X_data,y_data = dataset_generator.vectorize_dataset(corpus_reader=corpus_reader, ngram_order=NGRAM_ORDER, nb_samples=NB_SAMPLES)
+gc.collect()
 
 X_train,  y_train, X_val, y_val, X_holdout, y_holdout = split_dataset(X_data, y_data )
+del X_data
+del y_data
+gc.collect()
+
 
 print('X_train.shape={} X_val.shape={} X_holdout.shape={}'.format(X_train.shape, X_val.shape, X_holdout.shape))
 
@@ -112,7 +132,7 @@ predict_fn = theano.function(inputs=[input_var], outputs=test_prediction)
 
 print("Training...")
 
-WEIGHTS_FILE = 'wr_lasagne.model'
+WEIGHTS_FILE = '../data/wr_lasagne.model'
 best_val_acc = 0.0
 no_improvement_counter = 0 # подсчет эпох без улучшения точности на валидации, для early stopping
 

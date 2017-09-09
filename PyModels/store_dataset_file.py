@@ -31,13 +31,16 @@ nx = X_train.shape[1]
 nrow = 10000000
 x_header = str.join( '\t', [ 'x{}'.format(i) for i in range(nx) ] )+'\ty'
 Xy_train = np.hstack( (X_train, y_train.reshape( (y_train.shape[0],1) ) ) )[:nrow,:]
-np.savetxt( '../data/Xy_train.csv', Xy_train, fmt='%.18e', delimiter='\t', header=x_header, comments='')
+#np.savetxt( '../data/Xy_train.csv', Xy_train, fmt='%.18e', delimiter='\t', header=x_header, comments='')
+np.savetxt( '../data/Xy_train.csv', Xy_train, fmt='%g', delimiter='\t', header='', comments='')
 
 Xy_val = np.hstack( (X_val, y_val.reshape( (y_val.shape[0],1) ) ) )[:nrow,:]
-np.savetxt( '../data/Xy_val.csv', Xy_val, fmt='%.18e', delimiter='\t', header=x_header, comments='')
+#np.savetxt( '../data/Xy_val.csv', Xy_val, fmt='%.18e', delimiter='\t', header=x_header, comments='')
+np.savetxt( '../data/Xy_val.csv', Xy_val, fmt='%g', delimiter='\t', header='', comments='')
 
 Xy_holdout = np.hstack( (X_holdout, y_holdout.reshape( (y_holdout.shape[0],1) ) ) )[:nrow,:]
-np.savetxt( '../data/Xy_holdout.csv', Xy_holdout, fmt='%.18e', delimiter='\t', header=x_header, comments='')
+#np.savetxt( '../data/Xy_holdout.csv', Xy_holdout, fmt='%.18e', delimiter='\t', header=x_header, comments='')
+np.savetxt( '../data/Xy_holdout.csv', Xy_holdout, fmt='%g', delimiter='\t', header='', comments='')
 
 # --------------------------------------------------------------------
 
