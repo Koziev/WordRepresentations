@@ -126,7 +126,7 @@ class AutoEncoder(object):
                       optimizer='rmsprop',
                       metrics=['accuracy'])
 
-        plot_model(model, to_file=os.path.join(data_folder,'ae_model.png'))
+        #plot_model(model, to_file=os.path.join(data_folder,'ae_model.png'))
 
         with open(os.path.join(data_folder,'word_autoencoder.arch'),'w') as f:
             f.write(model.to_json())
