@@ -40,6 +40,11 @@ NB_SAMPLES=1,000,000  NGRAM_ORDER=4  net=MLP  w2v_tags acc=0.7653
 NB_SAMPLES=1,000,000  NGRAM_ORDER=4  net=CNN  w2v_tags acc=0.7775
 
 
+NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=MLP  char_indeces acc=0.6745
+NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=CNN  char_indeces acc=0.6250
+
+NB_SAMPLES=1,000,000  NGRAM_ORDER=3  net=MLP  ae acc=0.5616
+
 
 wr_keras_sdr2.py (Keras+Theano, Python)
 =======================================
