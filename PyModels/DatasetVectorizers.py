@@ -19,7 +19,7 @@ import math
 import sklearn.model_selection
 import sys
 import zipfile
-
+from model_configurator import ModelConfigurationSettings
 
 def get_ngrams(input_list, n):
   return zip(*[input_list[i:] for i in range(n)])
@@ -180,14 +180,32 @@ class W2V_Vectorizer(BaseVectorizer):
     def get_name(cls):
         return 'w2v'
 
+    def get_vectors_path(self):
+        # путь к word2vec модели или файлу с аналогичным форматом
+        return ModelConfigurationSettings.get_w2v_path()
+
+
     def _load_w2v(self):
-        # путь к word2vec модели
-        # TODO: вынести в конфигурацию
-        w2v_path = r'F:\Word2Vec\word_vectors_cbow=1_win=5_dim=32.txt'
-        #w2v_path = r'/home/eek/polygon/w2v/word_vectors_cbow=1_win=5_dim=32.txt'
-        print('Loading w2v model...')
-        w2v = gensim.models.KeyedVectors.load_word2vec_format(w2v_path, binary=False)
-        return w2v
+        w2v_path = self.get_vectors_path()
+        print('Loading w2v model from {}...'.format(w2v_path))
+        #w2v = gensim.models.KeyedVectors.load_word2vec_format(w2v_path, binary=False)
+        veclen = -1
+        nb_words = -1
+        word2vector = dict()
+        with codecs.open(w2v_path, 'r', 'utf-8') as rdr:
+            for line in rdr:
+                if veclen==-1:
+                    tx = line.strip().split()
+                    nb_words = int(tx[0])
+                    veclen = int(tx[1])
+                else:
+                    tx = line.strip().split()
+                    word = tx[0]
+                    vec = [ float(z) for z in tx[1:] ]
+                    vec = np.asarray(vec, dtype='float32')
+                    word2vector[word] = vec
+
+        return word2vector
 
     def vectorize_dataset(self, corpus_reader, ngram_order=None, nb_samples=None):
 
@@ -199,7 +217,8 @@ class W2V_Vectorizer(BaseVectorizer):
 
         w2v = self._load_w2v()
 
-        valid_words = set(w2v.vocab)
+        #valid_words = set(w2v.vocab)
+        valid_words = set(w2v.keys())
         (all_words, dataset_x, dataset_y) = self._load_ngrams(corpus_reader, valid_words, ngram_order, nb_samples)
 
         assert( len(dataset_x)==nb_samples )
@@ -209,9 +228,10 @@ class W2V_Vectorizer(BaseVectorizer):
         y_data = np.zeros((nb_samples), dtype='bool')
         y_data[:] = dataset_y[:]
 
-        nword = len(w2v.vocab)
+        #nword = len(w2v.vocab)
+        nword = len(w2v)
         print('Number of words={0}'.format(nword))
-        vec_len = len(w2v.syn0[0])
+        vec_len = len(w2v[w2v.keys()[0]])
         print('Vector length={0}'.format(vec_len))
 
         input_size = vec_len * ngram_order
@@ -222,6 +242,27 @@ class W2V_Vectorizer(BaseVectorizer):
                 X_data[idata, iword * vec_len:(iword + 1) * vec_len] = w2v[word]
 
         return (X_data, y_data)
+
+    # -------------------------------------------------------------------
+
+class AE_Vectorizer(W2V_Vectorizer):
+    """
+    В качестве репрезентаций слов берем их векторы с внутреннего слова
+    автоэнкодера (см. ./WordAutoencoders/word_autoencoder3.py).
+    Векторы слов в N-грамме склеиваются в один вектор.
+    """
+
+    def __init__(self):
+        super(W2V_Vectorizer, self).__init__()
+
+    @classmethod
+    def get_name(cls):
+        return 'ae'
+
+    def get_vectors_path(self):
+        return ModelConfigurationSettings.get_ae_path()
+
+
 
 # -------------------------------------------------------------------
 
@@ -606,27 +647,6 @@ class W2V_Tags_Vectorizer(W2V_Vectorizer):
                         id2tagset[t_id] = tagset
                     word2tagset[word] = tagset2id[tagset]
                     tagged_words.add(word)
-
-
-        # with codecs.open('word2tags_bin.dat','r','utf-8') as rdr:
-        #     for line in rdr:
-        #         tx = line.strip().split(u'\t')
-        #         word = tx[0]
-        #         tagset = []
-        #         for tag in tx[1:]:
-        #             if tag not in tag2id:
-        #                 tag2id[tag] = len(tag2id)
-        #             tagset.append(tag2id[tag])
-        #
-        #         tagset = tuple(tagset)
-        #         if tagset not in tagset2id:
-        #             t_id = len(tagset2id)
-        #             tagset2id[tagset] = t_id
-        #             id2tagset[t_id] = tagset
-        #         word2tagset[word] = tagset2id[tagset]
-        #         tagged_words.add(word)
-
-
 
         w2v = self._load_w2v()
 
