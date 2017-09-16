@@ -67,6 +67,10 @@ utf-8 файлу прошит в методе _get_corpus_path класса Base
 
 * **hashing_trick** - используется hashing trick для кодирования слов ограниченным числом битов индекса (см. описание https://en.wikipedia.org/wiki/Feature_hashing и реализацию https://radimrehurek.com/gensim/corpora/hashdictionary.html)  
 
+* **ae** - векторы слов получаются как активации на внутреннем слое автоэнкодера. Обучение
+автоэнкодера и получение векторов слов выполняется скриптом [word_autoencoder3.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/WordAutoEncoders/word_autoencoder3.py)
+в папке PyModels/WordAutoEncoders.
+
 Для нейросетей доступны два дополнительных способа представления, которые с помощью
 слоя Embedding (или аналогичного для используемой библиотеки deep learning) преобразуются
 в некоторое векторное представление.
@@ -80,10 +84,6 @@ utf-8 файлу прошит в методе _get_corpus_path класса Base
 возвращается в качестве представления n-граммы. С помощью слоя встраивания (Embedding в
 Keras или аналогичного) символы преобразуются в dense vector форму, с которой работает
 остальная часть нейросети. Получается вариант [Character-Aware Neural Language Model](https://arxiv.org/abs/1508.06615).
-
-* **ae** - векторы слов получаются как активации на внутреннем слое автоэнкодера. Обучение
-автоэнкодера и получение векторов слов выполняется скриптом [word_autoencoder3.py](https://github.com/Koziev/WordRepresentations/blob/master/PyModels/WordAutoEncoders/word_autoencoder3.py)
-в папке PyModels/WordAutoEncoders.
 
 ## Модули и решатели
 
