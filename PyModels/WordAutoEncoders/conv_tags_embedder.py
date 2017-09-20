@@ -30,7 +30,10 @@ from keras import backend as K
 
 
 class TagsEmbedder(object):
+
+
     def __init__(self):
+        self.BOUNDARY_CHAR = u'\b'
         pass
 
     @staticmethod
@@ -74,13 +77,13 @@ class TagsEmbedder(object):
 
 
     def encode_word(self, word):
-        return word.replace( u' - ', u'-').replace(u' ', u'_')
+        return self.BOUNDARY_CHAR+word.replace( u' - ', u'-').replace(u' ', u'_')+self.BOUNDARY_CHAR
 
     def fit(self, vector_size, grammar_dict, data_folder):
         words_list = list([self.normalize_word(word) for word in grammar_dict.vocab])
         self.nb_words = len(words_list)
-        self.max_word_len = max( len(word) for word in words_list )
-        all_chars = set()
+        self.max_word_len = max( len(word) for word in words_list )+2 # два граничных символа
+        all_chars = set(self.BOUNDARY_CHAR)
         for word in words_list:
             all_chars.update(word)
 
@@ -106,7 +109,7 @@ class TagsEmbedder(object):
 
         merged = keras.layers.concatenate(inputs=conv_list)
         encoder = Dense(units=int(merged_size/2), activation='relu')(merged)
-        encoder = Dense(units=int(merged_size/4), activation='relu')(merged)
+        encoder = Dense(units=int(merged_size/4), activation='relu')(encoder)
         encoder = Dense(units=vector_size, activation='sigmoid')(encoder)
 
 
